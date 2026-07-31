@@ -1,0 +1,66 @@
+schema_version: 1
+id: initial-implementation
+operation: composition
+goal: Implement the first usable, domain-neutral Recursive Codex plugin.
+baseline: empty-repository
+scope:
+  allowed:
+    - repository
+  protected: []
+provenance:
+  sources:
+    - philosophy-project working protocols
+    - Codex plugin and skill specifications
+  decisions:
+    - .recursive-codex/decisions/0001-initial-core.yaml
+changes:
+  - component: plugin
+    effect: added
+  - component: recursive workflow skill
+    effect: added
+  - component: validators and templates
+    effect: added
+  - component: neutral and research domains
+    effect: added
+relations:
+  - from: domain profiles
+    to: core protocol
+    effect: added
+  - from: project contract
+    to: authority and checks
+    effect: added
+possibilities:
+  opened:
+    - reusable domain packages
+    - advisory reviewer collectives
+  restricted:
+    - silent cross-domain vocabulary transfer
+    - stabilization without declared authority
+  deferred:
+    - networked MCP orchestration
+    - graphical user interface
+variants:
+  - id: copied-philosophy-protocol
+    status: rejected
+    reason: It would universalize domain vocabulary and carry excessive project coupling.
+  - id: domain-neutral-core
+    status: selected
+    reason: It separates reusable procedure from domain semantics.
+collective_findings:
+  - role: forward-test-reviewer
+    finding: Relative resource paths, realistic YAML mappings, and the citation-policy boundary required correction.
+    disposition: integrated
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0001-initial-core.yaml
+validation:
+  - check: plugin validation
+    result: passed
+  - check: skill validation
+    result: passed
+  - check: unit and smoke tests
+    result: passed
+recovery:
+  strategy: Revert the initial implementation commit; the baseline repository was empty.
+status: stabilized

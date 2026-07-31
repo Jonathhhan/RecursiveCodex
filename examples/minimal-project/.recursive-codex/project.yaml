@@ -1,0 +1,10 @@
+schema_version: 1
+project: minimal-project
+domain: neutral
+authority:
+  final_decision: project-owner
+paths:
+  events: .recursive-codex/events
+  decisions: .recursive-codex/decisions
+  protected: []
+checks: []

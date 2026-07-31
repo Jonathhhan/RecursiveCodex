@@ -1,0 +1,16 @@
+schema_version: 1
+id: neutral
+description: Repository-local copy of the neutral domain profile.
+authority:
+  default: repository-owner
+source_policy:
+  require_primary_sources: false
+collective_roles:
+  - id: consistency-reviewer
+    mandate: Check internal consistency and cross-component effects.
+  - id: counterexample-reviewer
+    mandate: Seek failures, excluded cases, and scope drift.
+checks: []
+limits:
+  - Validator success does not establish domain truth.
+  - Reviewer agreement does not replace repository-owner authority.

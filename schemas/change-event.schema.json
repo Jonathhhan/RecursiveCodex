@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jonathhhan/RecursiveCodex/schemas/change-event.schema.json",
+  "title": "Recursive Codex change event",
+  "type": "object",
+  "required": ["schema_version", "id", "operation", "goal", "baseline", "scope", "provenance", "changes", "relations", "possibilities", "authority", "validation", "recovery", "status"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "operation": {"enum": ["local_update", "composition", "revision", "reorganization", "audit"]},
+    "goal": {"type": "string", "minLength": 1},
+    "baseline": {"type": "string", "minLength": 1},
+    "scope": {"type": "object"},
+    "provenance": {"type": "object"},
+    "changes": {"type": "array"},
+    "relations": {"type": "array"},
+    "possibilities": {"type": "object"},
+    "variants": {"type": "array"},
+    "collective_findings": {"type": "array"},
+    "authority": {"type": "object"},
+    "validation": {"type": "array"},
+    "recovery": {"type": "object"},
+    "status": {"enum": ["proposed", "tested", "stabilized"]}
+  },
+  "additionalProperties": true
+}

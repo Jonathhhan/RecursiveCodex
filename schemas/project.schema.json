@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Jonathhhan/RecursiveCodex/schemas/project.schema.json",
+  "title": "Recursive Codex project contract",
+  "type": "object",
+  "required": ["schema_version", "project", "domain", "authority", "paths", "checks"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "project": {"type": "string", "minLength": 1},
+    "domain": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "authority": {
+      "type": "object",
+      "required": ["final_decision"],
+      "properties": {"final_decision": {"type": "string", "minLength": 1}}
+    },
+    "paths": {
+      "type": "object",
+      "required": ["events", "decisions", "protected"],
+      "properties": {
+        "events": {"type": "string", "minLength": 1},
+        "decisions": {"type": "string", "minLength": 1},
+        "protected": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "checks": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "additionalProperties": true
+}

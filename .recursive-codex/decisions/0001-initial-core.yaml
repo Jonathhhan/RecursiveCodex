@@ -1,0 +1,14 @@
+id: decision-initial-core
+date: 2026-07-31
+status: accepted
+authority: repository-owner
+decision: Implement the first domain-neutral Recursive Codex core as a Codex plugin.
+scope:
+  - core recursive workflow
+  - domain profiles
+  - change-event contracts
+  - advisory collectives
+  - deterministic initialization and validation
+limits:
+  - Do not universalize the source book's philosophical claims.
+  - Do not treat collective agreement as authority.

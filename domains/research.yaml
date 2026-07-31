@@ -1,0 +1,31 @@
+schema_version: 1
+id: research
+description: Profile for source-based research and argument development.
+authority:
+  default: principal-researcher
+vocabulary:
+  reserved:
+    - source
+    - evidence
+    - inference
+    - hypothesis
+source_policy:
+  require_primary_sources: true
+  distinguish:
+    - source_claim
+    - inference
+    - proposal
+    - accepted_conclusion
+collective_roles:
+  - id: provenance-reviewer
+    mandate: Verify source attribution and distinguish evidence from inference.
+  - id: counterargument-reviewer
+    mandate: Develop serious counterexamples and rival interpretations.
+  - id: coherence-reviewer
+    mandate: Check definitions, dependencies, and consistency across outputs.
+checks: []
+limits:
+  - Operational success is not evidence for a research claim.
+  - Citation presence is not evidence that a source supports the claim.
+  - A presentation-only citation change preserves source identity, locator, source selection, and claim support.
+  - A change to admissible sources, required evidence, metadata, locators, or claim support is a source-policy change and requires research authority.

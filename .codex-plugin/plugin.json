@@ -1,0 +1,28 @@
+{
+  "name": "recursive-codex",
+  "version": "0.1.0",
+  "description": "A domain-configurable framework for recursive, reviewable Codex project work.",
+  "author": {
+    "name": "Jonathan Frank",
+    "url": "https://github.com/Jonathhhan"
+  },
+  "homepage": "https://github.com/Jonathhhan/RecursiveCodex",
+  "repository": "https://github.com/Jonathhhan/RecursiveCodex",
+  "keywords": ["codex", "recursive-work", "provenance", "review", "collective"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Recursive Codex",
+    "shortDescription": "Recursive, reviewable project work.",
+    "longDescription": "Configure authority, provenance, variants, independent review, change events, and closure checks for complex Codex projects.",
+    "developerName": "Jonathan Frank",
+    "category": "Productivity",
+    "capabilities": ["Write", "Review", "Orchestrate"],
+    "websiteURL": "https://github.com/Jonathhhan/RecursiveCodex",
+    "defaultPrompt": [
+      "Initialize a recursive project profile.",
+      "Run a reviewed change with a change event.",
+      "Audit this project without changing it."
+    ],
+    "brandColor": "#34504A"
+  }
+}

@@ -1,0 +1,18 @@
+schema_version: 1
+id: neutral
+description: Minimal domain profile for projects without field-specific semantics.
+authority:
+  default: project-owner
+vocabulary:
+  reserved: []
+source_policy:
+  require_primary_sources: false
+collective_roles:
+  - id: consistency-reviewer
+    mandate: Check internal consistency and cross-component effects.
+  - id: counterexample-reviewer
+    mandate: Seek failures, excluded cases, and scope drift.
+checks: []
+limits:
+  - Validator success does not establish domain truth.
+  - Reviewer agreement does not replace the declared authority.

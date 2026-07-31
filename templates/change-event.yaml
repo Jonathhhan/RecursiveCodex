@@ -1,0 +1,27 @@
+schema_version: 1
+id: change-example
+operation: local_update
+goal: Describe the concrete outcome.
+baseline: git:HEAD
+scope:
+  allowed: []
+  protected: []
+provenance:
+  sources: []
+  decisions: []
+changes: []
+relations: []
+possibilities:
+  opened: []
+  restricted: []
+  deferred: []
+variants: []
+collective_findings: []
+authority:
+  required: false
+  status: not_required
+  reference: null
+validation: []
+recovery:
+  strategy: Revert the change commit.
+status: proposed
