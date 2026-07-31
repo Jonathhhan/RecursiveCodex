@@ -1,3 +1,5 @@
 __pycache__/
 *.pyc
 .recursive-codex/events/*.tmp
+.recursive-codex/runtime/*
+!.recursive-codex/runtime/generative-kernel.jsonl
