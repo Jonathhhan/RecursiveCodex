@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import importlib.util
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -16,13 +18,13 @@ def load_module(name: str, path: Path):
     return module
 
 
-import sys
 sys.path.insert(0, str(ROOT / "scripts"))
+init_project = load_module("init_project", ROOT / "scripts" / "init_project.py")
 validate_event = load_module("validate_event", ROOT / "scripts" / "validate_change_event.py")
 validate_project = load_module("validate_project", ROOT / "scripts" / "validate_project.py")
 
 
-class ValidatorTests(unittest.TestCase):
+class EventValidatorTests(unittest.TestCase):
     def test_template_event_is_valid_proposal(self):
         self.assertEqual(validate_event.validate(ROOT / "templates" / "change-event.yaml"), [])
 
@@ -34,14 +36,74 @@ class ValidatorTests(unittest.TestCase):
             path.write_text(text, encoding="utf-8")
             errors = validate_event.validate(path)
         self.assertTrue(any("passed validation" in error for error in errors))
+
     def test_real_event_mapping_lists_are_parsed(self):
         event = validate_event.load(ROOT / ".recursive-codex" / "events" / "0001-initial-implementation.yaml")
         self.assertEqual(event["changes"][0]["component"], "plugin")
         self.assertEqual(event["collective_findings"][0]["role"], "forward-test-reviewer")
 
+    def test_wrong_authority_type_is_reported_without_crashing(self):
+        text = (ROOT / "templates" / "change-event.yaml").read_text(encoding="utf-8")
+        text = text.replace("authority:\n  required: true\n  status: pending", "authority:\n  - invalid")
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "event.yaml"
+            path.write_text(text, encoding="utf-8")
+            errors = validate_event.validate(path)
+        self.assertIn("authority must be a mapping", errors)
 
+    def test_event_root_must_be_mapping(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "event.yaml"
+            path.write_text("- item\n", encoding="utf-8")
+            self.assertEqual(validate_event.validate(path), ["event must be a mapping"])
+
+
+class ProjectValidatorTests(unittest.TestCase):
     def test_minimal_example_project_is_valid(self):
         self.assertEqual(validate_project.validate(ROOT / "examples" / "minimal-project"), [])
+
+    def test_parent_traversal_path_is_rejected(self):
+        contract = """schema_version: 1
+project: unsafe
+ domain: neutral
+"""
+        template = (ROOT / "templates" / "project.yaml").read_text(encoding="utf-8")
+        template = template.replace("events: .recursive-codex/events", "events: ../events")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = root / ".recursive-codex"
+            target.mkdir()
+            (target / "project.yaml").write_text(template, encoding="utf-8")
+            errors = validate_project.validate(root)
+        self.assertIn("paths.events must stay inside the project", errors)
+
+    def test_checks_must_be_strings(self):
+        template = (ROOT / "templates" / "project.yaml").read_text(encoding="utf-8")
+        template = template.replace("checks: []", "checks:\n  - 42")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = root / ".recursive-codex"
+            target.mkdir()
+            (target / "project.yaml").write_text(template, encoding="utf-8")
+            errors = validate_project.validate(root)
+        self.assertIn("checks must be a list of non-empty strings", errors)
+
+
+class InitializerTests(unittest.TestCase):
+    def test_project_name_is_safely_quoted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            project = Path(directory) / "null # project"
+            project.mkdir()
+            with mock.patch.object(sys, "argv", ["init_project.py", str(project)]):
+                self.assertEqual(init_project.main(), 0)
+            contract = project / ".recursive-codex" / "project.yaml"
+            data = validate_project.load(contract)
+            self.assertEqual(data["project"], "null # project")
+            self.assertEqual(validate_project.validate(project), [])
+
+    def test_replace_once_rejects_template_drift(self):
+        with self.assertRaises(SystemExit):
+            init_project._replace_once("missing placeholder", "expected", "replacement")
 
 
 if __name__ == "__main__":
