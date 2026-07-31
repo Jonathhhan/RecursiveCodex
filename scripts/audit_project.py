@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import hashlib
 import re
 import sys
 import subprocess
@@ -18,6 +19,7 @@ from _mini_yaml import load
 from generative_kernel import read_journal
 from validate_change_event import validate as validate_event
 from validate_project import validate as validate_project
+from trust_policy import bootstrap
 
 STRUCTURED_BASELINE = re.compile(r"^stabilized event (?P<path>\.recursive-codex/events/[^ ]+\.yaml)$")
 EXTERNAL_BASELINES = {"empty-repository", "git:HEAD"}
@@ -72,6 +74,23 @@ def _cycle_errors(edges: dict[str, str]) -> list[str]:
     return errors
 
 
+def _promotion_receipt(root: Path, errors: list[str]) -> dict | None:
+    path = root / ".recursive-codex" / "runtime" / "last-promotion.json"
+    if not path.exists():
+        return None
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        errors.append(f"promotion receipt cannot be loaded: {exc}")
+        return None
+    candidate = value.get("candidate_digest") if isinstance(value, dict) else None
+    real = value.get("real_digest") if isinstance(value, dict) else None
+    equal = value.get("equal") if isinstance(value, dict) else None
+    if not all(isinstance(item, str) and len(item) == 64 for item in (candidate, real)) or equal is not True or candidate != real:
+        errors.append("promotion receipt does not bind equal candidate and real digests")
+    return value
+
+
 def audit(root: Path) -> dict:
     root = root.resolve()
     errors = list(validate_project(root))
@@ -79,6 +98,8 @@ def audit(root: Path) -> dict:
     events_dir = root / ".recursive-codex" / "events"
     decisions_dir = root / ".recursive-codex" / "decisions"
     events = _records(events_dir, "event", errors)
+    bootstrap_record = bootstrap()
+    promotion = _promotion_receipt(root, errors)
     decisions = _records(decisions_dir, "decision", errors)
     event_ids = _unique_ids(events, "event", errors)
     decision_ids = _unique_ids(decisions, "decision", errors)
@@ -156,6 +177,8 @@ def audit(root: Path) -> dict:
             "structured_baselines": len(edges), "journals": journals,
         },
         "workspace": workspace,
+        "bootstrap": bootstrap_record,
+        "last_promotion": promotion,
     }
 
 

@@ -1,0 +1,19 @@
+id: decision-anchor-owner-bootstrap
+date: 2026-08-01
+status: accepted
+classification: critical
+authority: repository-owner
+decision: Constitute the critical trust boundary through an explicit owner bootstrap bound to commit f36d7ad350038c7c1089ca8da9b63feb663df292 and forbid autonomous amendment of that bootstrap.
+alternatives:
+  - id: retrospective-system-legitimation
+    assessment: Rejected because the system cannot constitute the external limit on its own authority without recording the transition.
+  - id: owner-bootstrap
+    assessment: Selected because it makes the one-time constituting authority explicit and inspectable.
+criteria:
+  - external constituting authority
+  - immutable minimum critical core
+  - publicly visible CI evidence
+  - explicit promotion digest evidence
+limits:
+  - This record does not cryptographically prove a human identity; a signed Git tag remains a stronger optional attestation.
+event: .recursive-codex/events/0056-anchor-owner-bootstrap.yaml

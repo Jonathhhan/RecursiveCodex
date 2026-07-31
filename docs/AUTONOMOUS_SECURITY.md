@@ -13,6 +13,13 @@ After isolated candidate checks pass, promotion performs two additional bindings
 
 Thus a proposal cannot validate changed enforcement code only through stale imports in the long-running parent.
 
+## Constituting authority
+
+`config/bootstrap.yaml` records the one-time repository-owner constitution of the critical boundary at commit `f36d7ad350038c7c1089ca8da9b63feb663df292`. Autonomous self-amendment is forbidden. A mandatory critical set embedded in `trust_policy.py` means the YAML policy may extend but cannot remove the bootstrap, controller, policy, or manifest from critical protection.
+
+The exact bootstrap commit has a successful public [GitHub Actions CI run](https://github.com/Jonathhhan/RecursiveCodex/actions/runs/30673087859). This external run complements rather than replaces local event evidence.
+
+
 The autonomous child is a proposal generator, not a repository writer. It runs read-only and returns one patch. The parent validates paths and authority before evaluating that patch.
 
 Declared checks use structured argument vectors. String commands and shell interpretation are invalid project contracts:

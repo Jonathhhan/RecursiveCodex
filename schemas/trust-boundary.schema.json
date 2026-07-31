@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Recursive Codex trust boundary",
+  "type": "object",
+  "required": ["schema_version", "authorities", "critical", "high", "protected_outputs"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "authorities": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}},
+    "critical": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "high": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "protected_outputs": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+  },
+  "additionalProperties": false
+}

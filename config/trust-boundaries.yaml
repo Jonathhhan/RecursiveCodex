@@ -1,6 +1,12 @@
 schema_version: 1
+authorities:
+  trust-boundary: repository-owner
+  enforcement: repository-owner
+  domain-kernel: domain-owner
+  schemas: repository-owner
 critical:
   - config/trust-boundaries.yaml
+  - config/bootstrap.yaml
   - config/artifact-policy.yaml
   - scripts/run_autonomous.py
   - scripts/generative_kernel.py
@@ -25,6 +31,7 @@ protected_outputs:
   - .recursive-codex/project.yaml
   - .recursive-codex/domain.yaml
   - config/artifact-policy.yaml
+  - config/bootstrap.yaml
   - .recursive-codex/events
   - .recursive-codex/decisions
   - config/trust-boundaries.yaml

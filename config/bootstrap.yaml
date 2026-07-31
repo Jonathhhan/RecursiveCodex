@@ -1,0 +1,7 @@
+schema_version: 1
+established_by: repository-owner
+commit: f36d7ad350038c7c1089ca8da9b63feb663df292
+scope:
+  - trust-boundary-policy
+  - external-authority-requirement
+autonomous_self_amendment: forbidden

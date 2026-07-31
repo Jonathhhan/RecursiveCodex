@@ -722,6 +722,13 @@ def apply_proposal(
         if real_digest != candidate_digest:
             differences = snapshot_changes(candidate_snapshot, snapshot_tree(root, ephemeral_outputs))
             final_errors.append("real workspace digest differs from validated candidate: " + ", ".join(differences[:10]))
+        if not final_errors:
+            receipt = {
+                "candidate_digest": candidate_digest,
+                "real_digest": real_digest,
+                "equal": candidate_digest == real_digest,
+            }
+            (runtime / "last-promotion.json").write_text(json.dumps(receipt, sort_keys=True), encoding="utf-8")
         if final_errors:
             return rollback_real(final_errors)
     except OSError as exc:

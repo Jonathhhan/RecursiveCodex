@@ -1,0 +1,66 @@
+schema_version: 1
+id: anchor-owner-bootstrap
+operation: revision
+goal: Resolve the bootstrap legitimacy problem and make the trust boundary irreducible and auditable.
+baseline: stabilized event .recursive-codex/events/0055-verify-fresh-enforcement.yaml
+scope:
+  allowed:
+    - config/bootstrap.yaml
+    - config/trust-boundaries.yaml
+    - schemas/trust-boundary.schema.json
+    - scripts/trust_policy.py
+    - scripts/audit_project.py
+    - scripts/run_autonomous.py
+    - tests/test_bootstrap.py
+    - docs/AUTONOMOUS_SECURITY.md
+    - README.md
+    - .recursive-codex/decisions/0056-anchor-owner-bootstrap.yaml
+    - .recursive-codex/events/0056-anchor-owner-bootstrap.yaml
+  protected:
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - repository-owner request carrying the review of commit f36d7ad
+    - https://github.com/Jonathhhan/RecursiveCodex/actions/runs/30673087859
+    - .recursive-codex/events/0055-verify-fresh-enforcement.yaml
+  decisions:
+    - .recursive-codex/decisions/0056-anchor-owner-bootstrap.yaml
+changes:
+  - component: bootstrap record
+    effect: binds the constituting transition to repository-owner authority and the security commit
+  - component: mandatory critical core
+    effect: prevents the declarative policy from removing its own irreducible enforcement paths
+  - component: promotion audit
+    effect: reports candidate and real workspace digests from the last promotion receipt
+  - component: authority policy
+    effect: declares repository-owner and domain-owner responsibilities by boundary area
+relations:
+  - from: owner bootstrap
+    to: autonomous authority limit
+    effect: constitutes the limit externally rather than through retrospective system self-legitimation
+possibilities:
+  opened:
+    - signed tag attestation of the bootstrap commit
+    - domain-specific resource limits below global ceilings
+  restricted:
+    - removal of mandatory critical paths through a formally valid YAML policy
+    - silent divergence between validated candidate and promoted workspace
+  deferred:
+    - cryptographically signed owner tag
+variants:
+  - id: owner-bootstrap
+    status: selected
+    reason: It resolves the review's bootstrap contradiction without granting broader autonomous authority.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0056-anchor-owner-bootstrap.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: project validators and unified audit
+    result: passed 159 tests with 56 events, 56 decisions, 44 structured baselines, and no hard errors
+recovery:
+  strategy: Owner-authorized revert of this event; autonomous self-amendment remains forbidden.
+status: stabilized

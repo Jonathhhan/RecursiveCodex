@@ -1,5 +1,9 @@
 # Recursive Codex
 
+## Genealogy and scope
+
+The architecture originated in the book project *Zur Kritik der Organisation von Anschlussmöglichkeiten*. Its technical procedures—provenance, variants, relational review, decision gates, and reversibility—are generalized here. The book's philosophical concepts and claims are not generalized with them. See `docs/GENEALOGY.md`.
+
 Recursive Codex is a domain-configurable infrastructure for recursive, reviewable, reversible, and autonomously stabilized knowledge production.
 
 Software development is one application, not the universal model. Art, language, logic, philosophy, research, and other practices can define their own objects, validity dimensions, checks, and authorities without importing their vocabulary into the neutral core.
