@@ -20,6 +20,7 @@ def load_module(name: str, path: Path):
 
 sys.path.insert(0, str(ROOT / "scripts"))
 init_project = load_module("init_project", ROOT / "scripts" / "init_project.py")
+mini_yaml = load_module("mini_yaml", ROOT / "scripts" / "_mini_yaml.py")
 validate_event = load_module("validate_event", ROOT / "scripts" / "validate_change_event.py")
 validate_project = load_module("validate_project", ROOT / "scripts" / "validate_project.py")
 
@@ -44,7 +45,9 @@ class EventValidatorTests(unittest.TestCase):
 
     def test_wrong_authority_type_is_reported_without_crashing(self):
         text = (ROOT / "templates" / "change-event.yaml").read_text(encoding="utf-8")
-        text = text.replace("authority:\n  required: true\n  status: pending", "authority:\n  - invalid")
+        original = "authority:\n  required: false\n  status: not_required\n  reference: null"
+        self.assertIn(original, text, "template authority block changed")
+        text = text.replace(original, "authority:\n  - invalid", 1)
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "event.yaml"
             path.write_text(text, encoding="utf-8")
@@ -58,15 +61,28 @@ class EventValidatorTests(unittest.TestCase):
             self.assertEqual(validate_event.validate(path), ["event must be a mapping"])
 
 
+class MiniYamlTests(unittest.TestCase):
+    def test_inline_empty_containers_keep_their_types(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "values.yaml"
+            path.write_text("mapping: {}\nsequence: []\n", encoding="utf-8")
+            data = mini_yaml.load(path)
+        self.assertEqual(data["mapping"], {})
+        self.assertEqual(data["sequence"], [])
+
+    def test_nested_sequence_is_not_coerced_to_mapping(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "values.yaml"
+            path.write_text("authority:\n  - invalid\n", encoding="utf-8")
+            data = mini_yaml.load(path)
+        self.assertEqual(data["authority"], ["invalid"])
+
+
 class ProjectValidatorTests(unittest.TestCase):
     def test_minimal_example_project_is_valid(self):
         self.assertEqual(validate_project.validate(ROOT / "examples" / "minimal-project"), [])
 
     def test_parent_traversal_path_is_rejected(self):
-        contract = """schema_version: 1
-project: unsafe
- domain: neutral
-"""
         template = (ROOT / "templates" / "project.yaml").read_text(encoding="utf-8")
         template = template.replace("events: .recursive-codex/events", "events: ../events")
         with tempfile.TemporaryDirectory() as directory:
