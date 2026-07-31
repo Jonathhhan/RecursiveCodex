@@ -1,0 +1,18 @@
+id: decision-protect-enforcement-outputs
+date: 2026-08-01
+status: accepted
+classification: critical
+authority: recursive-codex-system
+decision: Prevent ephemeral outputs from overlapping all enforcement boundaries.
+alternatives:
+  - id: retain-previous-boundary
+    assessment: Rejected because it leaves the reviewed trust gap open.
+  - id: protect-enforcement-outputs
+    assessment: Selected because it closes one explicit review finding.
+criteria:
+  - deterministic enforcement
+  - explicit authority boundary
+limits:
+  - Security validation does not establish domain truth or quality.
+event: .recursive-codex/events/0047-protect-enforcement-outputs.yaml
+

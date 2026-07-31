@@ -1,0 +1,62 @@
+schema_version: 1
+id: protect-autopoiesis-kernel
+operation: local_update
+goal: Place all executable autopoiesis modules inside the critical boundary.
+baseline: stabilized event .recursive-codex/events/0048-classify-enforcement-critical.yaml
+scope:
+  allowed:
+    - config/trust-boundaries.yaml
+    - config/artifact-policy.yaml
+    - scripts/trust_policy.py
+    - scripts/artifact_policy.py
+    - scripts/validate_project.py
+    - scripts/run_autonomous.py
+    - domains/art.yaml
+    - domains/language.yaml
+    - domains/logic.yaml
+    - domains/philosophy.yaml
+    - tests/test_trust_policy.py
+    - tests/test_artifact_policy.py
+    - tests/test_autonomous_attestation.py
+    - .recursive-codex/decisions/0049-protect-autopoiesis-kernel.yaml
+    - .recursive-codex/events/0049-protect-autopoiesis-kernel.yaml
+  protected:
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - user-provided review of commit e25015b
+    - .recursive-codex/events/0048-classify-enforcement-critical.yaml
+  decisions:
+    - .recursive-codex/decisions/0049-protect-autopoiesis-kernel.yaml
+changes:
+  - component: protect-autopoiesis-kernel
+    effect: Place all executable autopoiesis modules inside the critical boundary.
+relations:
+  - from: reviewed trust gap
+    to: protect-autopoiesis-kernel
+    effect: converts the finding into enforced structure
+possibilities:
+  opened:
+    - safer unattended domain workflows
+  restricted:
+    - bypass of the expanded trust boundary
+  deferred:
+    - externally visible CI status
+variants:
+  - id: protect-autopoiesis-kernel
+    status: selected
+    reason: It directly addresses the reviewed priority.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0049-protect-autopoiesis-kernel.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: python scripts/recursive_codex.py audit . --json
+    result: passed 156 tests
+recovery:
+  strategy: Revert this security control and remove its decision and event records.
+status: stabilized
+

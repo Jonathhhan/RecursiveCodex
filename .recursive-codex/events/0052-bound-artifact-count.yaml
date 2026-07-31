@@ -1,0 +1,62 @@
+schema_version: 1
+id: bound-artifact-count
+operation: local_update
+goal: Bound artifact count and automatically generated checks.
+baseline: stabilized event .recursive-codex/events/0051-bind-validator-identities.yaml
+scope:
+  allowed:
+    - config/trust-boundaries.yaml
+    - config/artifact-policy.yaml
+    - scripts/trust_policy.py
+    - scripts/artifact_policy.py
+    - scripts/validate_project.py
+    - scripts/run_autonomous.py
+    - domains/art.yaml
+    - domains/language.yaml
+    - domains/logic.yaml
+    - domains/philosophy.yaml
+    - tests/test_trust_policy.py
+    - tests/test_artifact_policy.py
+    - tests/test_autonomous_attestation.py
+    - .recursive-codex/decisions/0052-bound-artifact-count.yaml
+    - .recursive-codex/events/0052-bound-artifact-count.yaml
+  protected:
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - user-provided review of commit e25015b
+    - .recursive-codex/events/0051-bind-validator-identities.yaml
+  decisions:
+    - .recursive-codex/decisions/0052-bound-artifact-count.yaml
+changes:
+  - component: bound-artifact-count
+    effect: Bound artifact count and automatically generated checks.
+relations:
+  - from: reviewed trust gap
+    to: bound-artifact-count
+    effect: converts the finding into enforced structure
+possibilities:
+  opened:
+    - safer unattended domain workflows
+  restricted:
+    - bypass of the expanded trust boundary
+  deferred:
+    - externally visible CI status
+variants:
+  - id: bound-artifact-count
+    status: selected
+    reason: It directly addresses the reviewed priority.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0052-bound-artifact-count.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: python scripts/recursive_codex.py audit . --json
+    result: passed 156 tests
+recovery:
+  strategy: Revert this security control and remove its decision and event records.
+status: stabilized
+

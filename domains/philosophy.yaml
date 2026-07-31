@@ -33,7 +33,7 @@ operation_cycle:
   - reformulate
   - stabilize
 artifact_contract:
-  validator: scripts/validate_domain_artifact.py
+  validator_id: domain-artifact-v1
   kind: philosophy
 collective_roles:
   - id: conceptual-reviewer

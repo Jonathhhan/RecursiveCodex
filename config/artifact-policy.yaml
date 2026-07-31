@@ -1,0 +1,8 @@
+schema_version: 1
+validators:
+  domain-artifact-v1: scripts/validate_domain_artifact.py
+limits:
+  max_artifacts: 256
+  max_dependency_depth: 32
+  max_artifact_bytes: 10485760
+  max_generated_checks: 256

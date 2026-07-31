@@ -19,10 +19,7 @@ class KnowledgeDomainProfileTests(unittest.TestCase):
                 self.assertTrue(profile["validity_dimensions"])
                 self.assertTrue(profile["operation_cycle"])
                 self.assertEqual(profile["artifact_contract"]["kind"], domain)
-                self.assertEqual(
-                    profile["artifact_contract"]["validator"],
-                    "scripts/validate_domain_artifact.py",
-                )
+                self.assertEqual(profile["artifact_contract"]["validator_id"], "domain-artifact-v1")
                 self.assertIsInstance(profile["checks"], list)
 
     def test_philosophy_keeps_truth_outside_validator_authority(self):

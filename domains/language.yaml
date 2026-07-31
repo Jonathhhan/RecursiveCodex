@@ -25,7 +25,7 @@ operation_cycle:
   - revise
   - stabilize
 artifact_contract:
-  validator: scripts/validate_domain_artifact.py
+  validator_id: domain-artifact-v1
   kind: language
 collective_roles:
   - id: semantic-reviewer

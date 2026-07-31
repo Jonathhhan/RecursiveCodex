@@ -1,0 +1,18 @@
+id: decision-verify-fresh-enforcement
+date: 2026-08-01
+status: accepted
+classification: critical
+authority: recursive-codex-system
+decision: Revalidate through a fresh process and bind promotion to the candidate digest.
+alternatives:
+  - id: retain-previous-boundary
+    assessment: Rejected because it leaves the reviewed trust gap open.
+  - id: verify-fresh-enforcement
+    assessment: Selected because it closes one explicit review finding.
+criteria:
+  - deterministic enforcement
+  - explicit authority boundary
+limits:
+  - Security validation does not establish domain truth or quality.
+event: .recursive-codex/events/0055-verify-fresh-enforcement.yaml
+

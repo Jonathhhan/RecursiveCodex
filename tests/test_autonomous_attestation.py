@@ -76,7 +76,7 @@ class AutonomousAttestationTests(unittest.TestCase):
     def test_parent_derives_minimum_risk_from_patch(self):
         cases = (
             ("scripts/run_autonomous.py", "high", "critical"),
-            ("scripts/validate_project.py", "medium", "high"),
+            ("scripts/validate_project.py", "medium", "critical"),
         )
         for path, declared, minimum in cases:
             with self.subTest(path=path):

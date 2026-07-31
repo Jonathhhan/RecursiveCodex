@@ -1,5 +1,18 @@
 # Autonomous controller security boundary
 
+## Declarative trust boundary
+
+`config/trust-boundaries.yaml` is the installed, self-protected classification shared by project validation and proposal risk derivation. Enforcement, audit, graph, validator, schema, and executable autopoiesis paths cannot be overwritten by ephemeral check output. Changes to critical paths require external authority.
+
+Artifact validators are selected by identity from `config/artifact-policy.yaml`; domain profiles cannot execute an arbitrary validator path. The same policy bounds artifact count, generated checks, dependency depth, and artifact byte size.
+
+After isolated candidate checks pass, promotion performs two additional bindings:
+
+1. the applied workspace is validated in a fresh Python process using the applied enforcement code;
+2. its bounded snapshot digest must equal the validated candidate digest.
+
+Thus a proposal cannot validate changed enforcement code only through stale imports in the long-running parent.
+
 The autonomous child is a proposal generator, not a repository writer. It runs read-only and returns one patch. The parent validates paths and authority before evaluating that patch.
 
 Declared checks use structured argument vectors. String commands and shell interpretation are invalid project contracts:

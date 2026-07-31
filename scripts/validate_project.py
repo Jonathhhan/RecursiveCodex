@@ -5,6 +5,8 @@ import sys
 from pathlib import Path
 
 from _mini_yaml import load
+from trust_policy import paths_for
+from artifact_policy import resource_errors, validator_path
 from artifact_graph import dependency_errors
 
 DOMAIN_PATTERN = re.compile(r"^[a-z0-9][a-z0-9-]*$")
@@ -26,13 +28,7 @@ def _safe_project_path(root: Path, value: str) -> Path | None:
     return resolved
 
 
-TRUST_ANCHORS = {
-    ".recursive-codex/project.yaml", ".recursive-codex/domain.yaml",
-    ".recursive-codex/events", ".recursive-codex/decisions",
-    "scripts/run_autonomous.py", "scripts/validate_project.py",
-    "scripts/validate_change_event.py", "scripts/generative_kernel.py",
-    "scripts/validate_discourse.py", "schemas",
-}
+TRUST_ANCHORS = paths_for("protected_outputs")
 
 
 def _paths_overlap(left: str, right: str) -> bool:
@@ -127,12 +123,10 @@ def _validate_artifacts(
     if contract is not None and not isinstance(contract, dict):
         errors.append("domain artifact_contract must be a mapping")
     elif isinstance(contract, dict):
-        validator = contract.get("validator")
+        validator = contract.get("validator_id")
         kind = contract.get("kind")
-        plugin_root = Path(__file__).resolve().parents[1]
-        validator_path = _safe_project_path(plugin_root, validator) if isinstance(validator, str) else None
-        if validator_path is None or not validator_path.is_file():
-            errors.append("domain artifact_contract.validator must name an installed validator")
+        try: validator_path(validator)
+        except (TypeError, ValueError) as exc: errors.append(str(exc))
         if not _is_non_empty_string(kind):
             errors.append("domain artifact_contract.kind must be set")
     elif value:
@@ -140,6 +134,7 @@ def _validate_artifacts(
     return errors
 
 
+    errors.extend(resource_errors(root, value))
 def validate(root: Path) -> list[str]:
     root = root.resolve()
     contract_path = root / ".recursive-codex" / "project.yaml"

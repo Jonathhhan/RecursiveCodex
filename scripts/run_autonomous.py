@@ -16,8 +16,10 @@ from pathlib import Path
 
 from _mini_yaml import load
 from artifact_graph import ordered_artifacts
+from artifact_policy import validator_path
 from generative_kernel import append_event, read_journal, replay, select_next
 from validate_change_event import validate as validate_event
+from trust_policy import risk_for_paths
 from validate_project import validate
 
 SYSTEM_AUTHORITY = "recursive-codex-system"
@@ -325,6 +327,11 @@ def snapshot_tree(root: Path, ephemeral_outputs: list[str] | None = None) -> dic
 def workspace_digest(root: Path) -> str:
     encoded = json.dumps(snapshot_tree(root), sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+def bounded_workspace_digest(root: Path, outputs: list[str]) -> str:
+    encoded = json.dumps(snapshot_tree(root, outputs), sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 
 
 def baseline_commit(root: Path) -> str:
@@ -338,16 +345,12 @@ def baseline_commit(root: Path) -> str:
 
 
 _RISK_ORDER = {"low": 0, "medium": 1, "high": 2, "critical": 3}
-_CRITICAL_PATHS = {
-    ".recursive-codex/project.yaml", ".recursive-codex/domain.yaml",
-    "scripts/run_autonomous.py", "scripts/generative_kernel.py",
-}
 
 
 def minimum_proposal_risk(paths: list[str], patch: str) -> str:
     normalized = {Path(path).as_posix() for path in paths}
-    if normalized & _CRITICAL_PATHS:
-        return "critical"
+    policy_risk = risk_for_paths(paths)
+    if policy_risk == "critical": return "critical"
     high = (
         len(normalized) >= 10
         or "+++ /dev/null" in patch
@@ -360,7 +363,7 @@ def minimum_proposal_risk(paths: list[str], patch: str) -> str:
             for path in normalized
         )
     )
-    return "high" if high else "low"
+    return "high" if high else policy_risk
 
 
 def proposal_attestation_errors(
@@ -658,6 +661,7 @@ def apply_proposal(
 
         stabilized_event = (candidate / event_paths[0]).read_bytes()
         stabilized_decision = (candidate / decision_paths[0]).read_bytes()
+        ephemeral_outputs = [output for check in checks for output in check.get("ephemeral_outputs", [])]
         for declared_check in checks:
             check_error = isolated_check_error(
                 declared_check, candidate, timeout, {"<event-file>": event_paths[0]})
@@ -674,7 +678,8 @@ def apply_proposal(
             detail = ", ".join(concurrent_changes[:20])
             return [f"real workspace changed during isolated validation: {detail}"]
 
-        stabilized_text = stabilized_event.decode("utf-8")
+        candidate_snapshot = snapshot_tree(candidate, ephemeral_outputs)
+        candidate_digest = bounded_workspace_digest(candidate, ephemeral_outputs)
 
     runtime.mkdir(parents=True, exist_ok=True)
     patch_file = runtime / "proposal.patch"
@@ -702,10 +707,21 @@ def apply_proposal(
         return messages
 
     try:
-        event.write_text(stabilized_text, encoding="utf-8")
-        final_errors = validate(root) + [
+        event.write_bytes(stabilized_event)
+        fresh = subprocess.run(
+            [sys.executable, str(root / "scripts" / "validate_project.py"), str(root)],
+            cwd=root, check=False, capture_output=True, text=True, timeout=timeout or None,
+        )
+        fresh_errors = [] if fresh.returncode == 0 else [
+            "fresh project enforcement failed: " + redact_diagnostic(fresh.stdout + fresh.stderr)
+        ]
+        final_errors = fresh_errors + validate(root) + [
             f"{event.name}: {error}" for error in validate_event(event)
         ]
+        real_digest = bounded_workspace_digest(root, ephemeral_outputs)
+        if real_digest != candidate_digest:
+            differences = snapshot_changes(candidate_snapshot, snapshot_tree(root, ephemeral_outputs))
+            final_errors.append("real workspace digest differs from validated candidate: " + ", ".join(differences[:10]))
         if final_errors:
             return rollback_real(final_errors)
     except OSError as exc:
@@ -850,15 +866,15 @@ def effective_declared_checks(root: Path, contract: dict) -> list[dict]:
         artifact_contract = domain_profile.get("artifact_contract")
         if not isinstance(artifact_contract, dict):
             raise ValueError("artifacts require domain artifact_contract")
-        validator = artifact_contract.get("validator")
+        validator = artifact_contract.get("validator_id")
         kind = artifact_contract.get("kind")
         if not isinstance(validator, str) or not isinstance(kind, str):
             raise ValueError("domain artifact contract is invalid")
-        validator_path = Path(__file__).resolve().parents[1] / validator
+        installed_validator = validator_path(validator)
         for artifact in ordered_artifacts(artifacts):
             artifact_checks.append({
                 "id": f"artifact-{artifact['id']}",
-                "command": [sys.executable, str(validator_path), kind, artifact["path"]],
+                "command": [sys.executable, str(installed_validator), kind, artifact["path"]],
                 "ephemeral_outputs": [],
             })
     return [*domain_checks, *artifact_checks, *project_checks]

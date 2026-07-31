@@ -59,7 +59,7 @@ class AutonomousControllerTests(unittest.TestCase):
             profile.parent.mkdir()
             profile.write_text(
                 "schema_version: 1\nid: philosophy\nauthority:\n  default: owner\n"
-                "artifact_contract:\n  validator: scripts/validate_domain_artifact.py\n"
+                "artifact_contract:\n  validator_id: domain-artifact-v1\n"
                 "  kind: philosophy\nchecks:\n  - id: domain-check\n"
                 "    command:\n      - domain\n    ephemeral_outputs: []\n",
                 encoding="utf-8",

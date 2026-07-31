@@ -1,0 +1,62 @@
+schema_version: 1
+id: declare-trust-boundary
+operation: local_update
+goal: Install a declarative and self-protected trust-boundary manifest.
+baseline: stabilized event .recursive-codex/events/0045-validate-artifact-graph.yaml
+scope:
+  allowed:
+    - config/trust-boundaries.yaml
+    - config/artifact-policy.yaml
+    - scripts/trust_policy.py
+    - scripts/artifact_policy.py
+    - scripts/validate_project.py
+    - scripts/run_autonomous.py
+    - domains/art.yaml
+    - domains/language.yaml
+    - domains/logic.yaml
+    - domains/philosophy.yaml
+    - tests/test_trust_policy.py
+    - tests/test_artifact_policy.py
+    - tests/test_autonomous_attestation.py
+    - .recursive-codex/decisions/0046-declare-trust-boundary.yaml
+    - .recursive-codex/events/0046-declare-trust-boundary.yaml
+  protected:
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - user-provided review of commit e25015b
+    - .recursive-codex/events/0045-validate-artifact-graph.yaml
+  decisions:
+    - .recursive-codex/decisions/0046-declare-trust-boundary.yaml
+changes:
+  - component: declare-trust-boundary
+    effect: Install a declarative and self-protected trust-boundary manifest.
+relations:
+  - from: reviewed trust gap
+    to: declare-trust-boundary
+    effect: converts the finding into enforced structure
+possibilities:
+  opened:
+    - safer unattended domain workflows
+  restricted:
+    - bypass of the expanded trust boundary
+  deferred:
+    - externally visible CI status
+variants:
+  - id: declare-trust-boundary
+    status: selected
+    reason: It directly addresses the reviewed priority.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0046-declare-trust-boundary.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: python scripts/recursive_codex.py audit . --json
+    result: passed 156 tests
+recovery:
+  strategy: Revert this security control and remove its decision and event records.
+status: stabilized
+

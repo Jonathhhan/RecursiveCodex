@@ -1,0 +1,33 @@
+schema_version: 1
+critical:
+  - config/trust-boundaries.yaml
+  - config/artifact-policy.yaml
+  - scripts/run_autonomous.py
+  - scripts/generative_kernel.py
+  - scripts/audit_project.py
+  - scripts/artifact_graph.py
+  - scripts/recursive_codex.py
+  - scripts/artifact_policy.py
+  - scripts/validate_change_event.py
+  - scripts/validate_discourse.py
+  - scripts/validate_domain_artifact.py
+  - scripts/validate_project.py
+  - scripts/trust_policy.py
+  - domains/autopoiesis/kernel.py
+  - domains/autopoiesis/bridge.py
+  - domains/autopoiesis/cycle.py
+  - domains/autopoiesis/forms.py
+  - domains/autopoiesis/propositions.py
+high:
+  - schemas
+  - domains
+protected_outputs:
+  - .recursive-codex/project.yaml
+  - .recursive-codex/domain.yaml
+  - config/artifact-policy.yaml
+  - .recursive-codex/events
+  - .recursive-codex/decisions
+  - config/trust-boundaries.yaml
+  - scripts
+  - schemas
+  - domains/autopoiesis

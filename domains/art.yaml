@@ -29,7 +29,7 @@ operation_cycle:
   - select
   - stabilize
 artifact_contract:
-  validator: scripts/validate_domain_artifact.py
+  validator_id: domain-artifact-v1
   kind: art
 collective_roles:
   - id: formal-reviewer
