@@ -1,0 +1,22 @@
+id: decision-discourse-revocation-semantics
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Accept explicit discourse revocation markers that preserve stabilized historical closure while making revoked evidence inadmissible for normative generative-kernel goals.
+alternatives:
+  - id: rewrite-closure
+    assessment: Changing accepted closure to contested would erase the distinction between the historical decision and its later loss of normative force.
+  - id: explicit-revocation-marker
+    assessment: Preserves the accepted historical record while making current admissibility deterministic during admission and replay.
+criteria:
+  - provenance preservation
+  - deterministic replay
+  - discourse-legitimacy boundary
+  - compatibility with stabilized records
+limits:
+  - Structural validation cannot establish whether revocation is substantively justified.
+  - The declared revocation authority remains answerable to the active domain profile and project contract.
+  - Revocation affects normative admissibility and does not delete the historical discourse record.
+  - Technical goals remain outside the discourse gate.
+event: .recursive-codex/events/0026-discourse-revocation-semantics.yaml
+

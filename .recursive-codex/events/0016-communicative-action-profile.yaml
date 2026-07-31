@@ -1,0 +1,55 @@
+schema_version: 1
+id: communicative-action-profile
+operation: composition
+goal: Add an optional discourse gate for projects requiring communicative rather than merely procedural legitimacy.
+baseline: stabilized event .recursive-codex/events/0015-conditional-hyperspace-exclusions.yaml
+scope:
+  allowed:
+    - domains/communicative-action.yaml
+    - scripts/validate_discourse.py
+    - tests/test_discourse.py
+    - examples/communicative-event.yaml
+    - docs/COMMUNICATIVE_ACTION.md
+    - .recursive-codex/decisions/0016-select-discourse-profile.yaml
+    - .recursive-codex/events/0016-communicative-action-profile.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - user approval to implement the Habermasian critique
+    - docs/ARCHITECTURE.md
+  decisions:
+    - .recursive-codex/decisions/0016-select-discourse-profile.yaml
+changes: []
+relations: []
+possibilities:
+  opened:
+    - optional discourse-legitimacy validation
+  restricted:
+    - treating validator success alone as communicative legitimacy
+  deferred:
+    - interactive participation adapters
+variants:
+  - id: core-enforcement
+    status: rejected
+    reason: It would impose domain vocabulary on every project.
+  - id: optional-domain-profile
+    status: selected
+    reason: It preserves the core-domain boundary while providing deterministic discourse gates.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0016-select-discourse-profile.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 42 tests
+  - check: project and template event validators
+    result: passed
+  - check: python scripts/validate_discourse.py examples/communicative-event.yaml
+    result: passed
+recovery:
+  strategy: Remove the profile, validator, tests, example, documentation, decision, and event.
+status: stabilized

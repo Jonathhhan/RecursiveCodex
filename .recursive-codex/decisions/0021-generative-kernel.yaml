@@ -1,0 +1,17 @@
+id: decision-generative-kernel
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Introduce an append-only event-sourced generative kernel for persistent goals, capabilities, attempts, and outcomes.
+alternatives:
+  - id: mutable-snapshot
+    assessment: Compact but permits failed attempts and provenance to be overwritten.
+  - id: append-only-journal
+    assessment: Reconstructs state deterministically while preserving failures and outcomes.
+criteria:
+  - persistent learning memory
+  - deterministic selection
+  - explicit blocked and quiescent states
+  - recovery through replay
+limits:
+  - The kernel records declared events and does not establish their truth or legitimacy.

@@ -1,0 +1,73 @@
+schema_version: 1
+id: decode-file-headers
+operation: revision
+goal: Prevent quoted unified-patch file markers from concealing protected or unsafe proposal paths.
+baseline: stabilized event .recursive-codex/events/0019-decode-git-quoted-paths.yaml
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0020-decode-file-headers.yaml
+    - .recursive-codex/events/0020-decode-file-headers.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - .recursive-codex/events/0017-complete-patch-path-discovery.yaml
+    - .recursive-codex/events/0019-decode-git-quoted-paths.yaml
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+  decisions:
+    - .recursive-codex/decisions/0017-complete-patch-path-discovery.yaml
+    - .recursive-codex/decisions/0019-decode-git-quoted-paths.yaml
+    - .recursive-codex/decisions/0020-decode-file-headers.yaml
+changes:
+  - component: file-marker parser
+    effect: decodes quoted source and destination paths and verifies their side prefixes
+  - component: proposal path discovery
+    effect: records normalized identities from both diff and file-marker headers
+  - component: proposal preflight
+    effect: rejects malformed or ambiguous file-marker paths before invoking Git
+  - component: controller regression tests
+    effect: covers octal concealment and malformed quoted file markers
+relations:
+  - from: plain unified patches
+    to: protected-path enforcement
+    effect: file-marker paths are normalized even when no diff header is present
+  - from: quoted path spelling
+    to: proposal scope
+    effect: all supported path-bearing headers now resolve through the same decoder
+  - from: malformed file markers
+    to: proposal application
+    effect: ambiguity stops application before Git is invoked
+possibilities:
+  opened:
+    - safe autonomous handling of quoted plain unified patches
+    - consistent path identity across supported patch headers
+  restricted:
+    - concealing protected paths through quoted file markers
+    - applying ambiguous unquoted file-marker paths
+  deferred:
+    - support for file headers carrying non-path timestamp metadata
+    - persistent structured memory for rolled-back proposals
+variants:
+  - id: rely-on-diff-headers
+    status: rejected
+    reason: Plain unified patches need not contain a diff header, leaving their quoted paths unnormalized.
+  - id: decode-all-path-headers
+    status: selected
+    reason: Reusing strict Git path decoding closes the gap without creating a second path-identity policy.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0020-decode-file-headers.yaml
+validation:
+  - check: parent controller executed all declared project checks
+    result: passed
+  - check: parent controller validated project and all change events
+    result: passed
+recovery:
+  strategy: Revert the controller, tests, decision, and this event.
+status: stabilized

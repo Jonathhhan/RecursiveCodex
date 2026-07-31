@@ -1,0 +1,19 @@
+id: decision-decode-file-headers
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Decode and validate Git C-style quoted file-marker paths before autonomous proposal scope and protection checks.
+alternatives:
+  - id: rely-on-diff-headers
+    assessment: Covers Git-format patches but leaves plain unified patches with quoted file markers outside normalized path inspection.
+  - id: decode-all-path-headers
+    assessment: Applies the established strict decoder to every path-bearing patch header before enforcing invariants.
+criteria:
+  - protected-path enforcement
+  - fail-closed malformed-input handling
+  - consistent path identity
+  - compatibility with plain unified patches
+limits:
+  - Header decoding establishes path identity only and does not establish proposal admissibility or truth.
+  - File headers with ambiguous unquoted whitespace or malformed escapes remain unsupported.
+  - Patch application remains delegated to Git after structural gates pass.

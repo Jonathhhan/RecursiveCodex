@@ -1,0 +1,11 @@
+id: decision-transfer-system-authority
+date: 2026-07-31
+status: accepted
+authority: repository-owner
+decision: Permanently transfer final repository decision authority to recursive-codex-system.
+scope:
+  - .recursive-codex/project.yaml
+  - .recursive-codex/domain.yaml
+limits:
+  - Preserve protected paths, provenance, validation, recovery, sandbox, and resource invariants.
+  - The transfer can be reversed only by an accepted operation under the then-active authority.

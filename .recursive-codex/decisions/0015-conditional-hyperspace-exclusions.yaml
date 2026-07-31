@@ -1,0 +1,19 @@
+id: decision-conditional-hyperspace-exclusions
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Accept explicit when-unless exceptions for declarative hyperspace exclusions.
+alternatives:
+  - id: expand-legacy-rules
+    assessment: Represents some exceptions by enumerating allowed options, but duplicates rules and couples constraints to complete option lists.
+  - id: conditional-exceptions
+    assessment: Expresses an exception directly and delays pruning until every referenced choice is observable.
+criteria:
+  - domain-neutral relational semantics
+  - deterministic evaluation
+  - backward compatibility
+  - explicit consequence tracing
+limits:
+  - Conditional rules are declared constraints, not inferred domain truths.
+  - Evaluation must not prune a partial state before its exception dimensions are available.
+  - Existing mapping exclusions retain their established behavior.

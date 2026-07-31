@@ -1,0 +1,12 @@
+id: decision-verify-system-decision
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Require the parent proposal gate to verify the authority and event binding of every autonomous system decision.
+scope:
+  - autonomous parent proposal gate
+  - controller regression tests
+limits:
+  - Preserve read-only child execution and parent-owned stabilization.
+  - Reject rather than reinterpret malformed, unauthorized, or unreferenced decisions.
+  - This structural check does not establish domain truth.

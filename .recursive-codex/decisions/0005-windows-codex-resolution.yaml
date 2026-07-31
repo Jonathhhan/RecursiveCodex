@@ -1,0 +1,10 @@
+id: decision-windows-codex-resolution
+date: 2026-07-31
+status: accepted
+authority: repository-owner
+decision: Accept explicit PowerShell-shim resolution and non-Git project support for the Windows autonomous controller.
+scope:
+  - Windows Codex process startup
+  - non-Git initialized projects
+limits:
+  - Preserve argument-vector execution and workspace sandboxing.

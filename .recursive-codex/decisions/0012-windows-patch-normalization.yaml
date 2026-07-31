@@ -1,0 +1,10 @@
+id: decision-windows-patch-normalization
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Use git apply recount and ignore-space-change for autonomous proposal checks, application, and reversal.
+scope:
+  - parent patch application
+limits:
+  - Do not use ignore-whitespace.
+  - Protected and unsafe path checks remain mandatory.

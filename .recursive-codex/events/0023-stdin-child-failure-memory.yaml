@@ -1,0 +1,65 @@
+schema_version: 1
+id: stdin-child-failure-memory
+operation: revision
+goal: Make strategic prompts Windows-safe and retain child execution failures.
+baseline: stabilized event .recursive-codex/events/0022-integrate-generative-kernel.yaml
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous_transport.py
+    - .recursive-codex/decisions/0023-stdin-child-failure-memory.yaml
+    - .recursive-codex/events/0023-stdin-child-failure-memory.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - failed strategic child invocation with unexpected CLI argument
+    - .recursive-codex/events/0022-integrate-generative-kernel.yaml
+    - .recursive-codex/runtime/generative-kernel.jsonl
+  decisions:
+    - .recursive-codex/decisions/0023-stdin-child-failure-memory.yaml
+changes:
+  - component: prompt transport
+    effect: sends prompts through standard input rather than a PowerShell argument
+  - component: failure memory
+    effect: records child timeouts and nonzero exits against selected goals
+relations:
+  - from: strategic context
+    to: child invocation
+    effect: JSON-bearing prompts avoid shell argument splitting
+  - from: child failure
+    to: future selection
+    effect: execution failures remain available to later attempts
+possibilities:
+  opened:
+    - reliable strategic prompts on Windows
+    - learning before proposal parsing
+  restricted:
+    - full prompts as shell arguments
+  deferred:
+    - externally terminated controller recording
+variants:
+  - id: prompt-file
+    status: rejected
+    reason: It creates a persistent full-prompt artifact.
+  - id: standard-input
+    status: selected
+    reason: It bypasses shell quoting without persistent prompt content.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0023-stdin-child-failure-memory.yaml
+validation:
+  - check: python -m unittest discover -s tests -q
+    result: passed 63 tests
+  - check: python scripts/validate_project.py .
+    result: passed
+  - check: python scripts/validate_change_event.py templates/change-event.yaml
+    result: passed
+  - check: python scripts/validate_change_event.py .recursive-codex/events/0023-stdin-child-failure-memory.yaml
+    result: passed
+recovery:
+  strategy: Revert transport, memory, tests, decision, and event.
+status: stabilized

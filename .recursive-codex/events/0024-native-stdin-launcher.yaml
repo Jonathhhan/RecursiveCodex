@@ -1,0 +1,65 @@
+schema_version: 1
+id: native-stdin-launcher
+operation: revision
+goal: Make the stabilized stdin prompt contract executable through the Windows Codex launcher.
+baseline: stabilized event .recursive-codex/events/0023-stdin-child-failure-memory.yaml
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0024-native-stdin-launcher.yaml
+    - .recursive-codex/events/0024-native-stdin-launcher.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - failed end-to-end autonomous cycle after event 0023
+    - .recursive-codex/events/0005-windows-codex-resolution.yaml
+    - .recursive-codex/events/0023-stdin-child-failure-memory.yaml
+    - .recursive-codex/runtime/generative-kernel.jsonl
+  decisions:
+    - .recursive-codex/decisions/0024-native-stdin-launcher.yaml
+changes:
+  - component: executable resolution
+    effect: uses the platform path resolver and selects codex.CMD instead of preferring codex.ps1 on Windows
+  - component: regression test
+    effect: locks native path resolution independently of the host platform
+relations:
+  - from: stdin prompt contract
+    to: native launcher
+    effect: structured prompts reach codex exec without PowerShell shim argument processing
+  - from: child exit failure
+    to: generative journal
+    effect: the observed launcher failure remains available to later selection
+possibilities:
+  opened:
+    - end-to-end autonomous stdin execution on Windows
+  restricted:
+    - automatic preference for PowerShell npm shims
+  deferred:
+    - launcher capability probing
+variants:
+  - id: powershell-shim
+    status: rejected
+    reason: It failed the stabilized stdin invocation contract in the observed runtime.
+  - id: native-path-match
+    status: selected
+    reason: It delegates executable selection to the platform resolver and preserves an argument vector.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0024-native-stdin-launcher.yaml
+validation:
+  - check: python -m unittest discover -s tests -q
+    result: passed 63 tests
+  - check: python scripts/validate_project.py .
+    result: passed
+  - check: python scripts/validate_change_event.py templates/change-event.yaml
+    result: passed
+  - check: python scripts/validate_change_event.py .recursive-codex/events/0024-native-stdin-launcher.yaml
+    result: passed
+recovery:
+  strategy: Restore PowerShell shim preference and its regression test, then remove this decision and event.
+status: stabilized

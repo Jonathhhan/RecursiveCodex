@@ -1,0 +1,67 @@
+schema_version: 1
+id: generative-kernel
+operation: composition
+goal: Add persistent strategic memory and deterministic goal selection to Recursive Codex.
+baseline: stabilized event .recursive-codex/events/0020-decode-file-headers.yaml
+scope:
+  allowed:
+    - scripts/generative_kernel.py
+    - tests/test_generative_kernel.py
+    - docs/GENERATIVE_KERNEL.md
+    - .recursive-codex/decisions/0021-generative-kernel.yaml
+    - .recursive-codex/events/0021-generative-kernel.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - user approval of the proposed generative kernel
+    - two repeated rolled-back autonomous proposals before event 0018
+    - docs/ARCHITECTURE.md
+  decisions:
+    - .recursive-codex/decisions/0021-generative-kernel.yaml
+changes:
+  - component: generative kernel
+    effect: replays persistent goals, capabilities, attempts, and outcomes from an append-only journal
+  - component: goal selector
+    effect: distinguishes selected, blocked, and quiescent states deterministically
+  - component: tests and documentation
+    effect: covers priority, dependencies, failure memory, outcomes, replay, and invalid identity
+relations:
+  - from: failed attempts
+    to: future goal selection
+    effect: unsuccessful strategies remain visible instead of disappearing on rollback
+  - from: capabilities
+    to: goals
+    effect: unavailable prerequisites yield an explicit blocked state
+possibilities:
+  opened:
+    - strategic scheduling across autonomous cycles
+    - persistent learning from failed operations
+  restricted:
+    - overwriting failure history with a mutable snapshot
+  deferred:
+    - controller integration
+    - discourse-gated normative goal admission
+variants:
+  - id: mutable-snapshot
+    status: rejected
+    reason: It cannot guarantee preservation of failed attempts.
+  - id: append-only-journal
+    status: selected
+    reason: It preserves genealogy and permits deterministic replay.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0021-generative-kernel.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 57 tests
+  - check: python scripts/validate_project.py .
+    result: passed
+  - check: project template and event validators
+    result: passed
+recovery:
+  strategy: Remove the kernel, tests, documentation, decision, and event.
+status: stabilized

@@ -1,0 +1,91 @@
+schema_version: 1
+id: bounded-autonomous-learning
+operation: reorganization
+goal: Extend Recursive Codex with a bounded autonomous cycle interpreted through a domain-specific Luhmannian autopoiesis profile without universalizing that vocabulary.
+baseline: working-tree-after-validate-domain-binding
+scope:
+  allowed:
+    - skills/recursive-codex/SKILL.md
+    - templates/project.yaml
+    - schemas/project.schema.json
+    - scripts/validate_project.py
+    - tests/test_validators.py
+    - .recursive-codex/project.yaml
+    - examples/minimal-project/.recursive-codex/project.yaml
+    - docs/ARCHITECTURE.md
+    - docs/AUTOPOIESIS.md
+    - domains/autopoiesis.yaml
+    - .recursive-codex/decisions/0003-autopoietic-autonomy.yaml
+    - .recursive-codex/events/0003-bounded-autonomous-learning.yaml
+  protected:
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - user requirement for a self-optimizing autonomous system
+    - user clarification: autopoiesis in Niklas Luhmann's sense
+    - skills/recursive-codex/SKILL.md
+    - docs/ARCHITECTURE.md
+    - docs/AUTOPOIESIS.md
+    - domains/autopoiesis.yaml
+    - .recursive-codex/project.yaml
+  decisions:
+    - .recursive-codex/decisions/0001-initial-core.yaml
+    - .recursive-codex/decisions/0002-validate-domain-binding.yaml
+    - .recursive-codex/decisions/0003-autopoietic-autonomy.yaml
+changes:
+  - component: autopoiesis domain profile
+    effect: declares recursive-codex-system as the final decision authority
+  - component: recursive workflow skill
+    effect: adds autonomous reproduction until quiescence or an invariant stop
+  - component: architecture documentation
+    effect: distinguishes Luhmannian interpretation from technical identity
+relations:
+  - from: environmental perturbations
+    to: autonomous operation selection
+    effect: inputs trigger observation but cannot bypass admissibility
+  - from: stabilized operation
+    to: next candidate operation
+    effect: each accepted state becomes a new reproductive baseline
+  - from: system authority
+    to: stabilization
+    effect: no human acceptance is required in the autonomous profile
+possibilities:
+  opened:
+    - bounded autonomous reproduction of validated operations
+    - explicit self-observation through validation evidence
+  restricted:
+    - unbounded recursive execution
+    - self-authorization of protected or final decisions
+  deferred:
+    - unattended process scheduling
+    - automatic invocation of external agents
+variants:
+  - id: unrestricted-self-modification
+    status: rejected
+    reason: It could remove its own authority, provenance, and safety constraints.
+  - id: bounded-autonomous-cycle
+    status: selected
+    reason: It permits iterative self-improvement within explicit budgets and authority gates.
+collective_findings:
+  - role: conceptual-consistency-reviewer
+    finding: Autopoiesis must not be reduced to metric optimization or unrestricted self-modification.
+    disposition: integrated
+  - role: closure-reviewer
+    finding: Full autonomy still requires reproduced invariants and structural coupling to environmental inputs.
+    disposition: integrated
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0003-autopoietic-autonomy.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: root and minimal project validators
+    result: passed
+  - check: autopoiesis profile initialization and project validation
+    result: passed
+  - check: change-event and template validators
+    result: passed
+recovery:
+  strategy: Revert all files listed in scope.allowed.
+status: stabilized

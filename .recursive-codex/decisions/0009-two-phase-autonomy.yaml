@@ -1,0 +1,11 @@
+id: decision-two-phase-autonomy
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Adopt read-only child proposals with validated parent-side application.
+scope:
+  - autonomous controller
+  - autonomous result schema
+limits:
+  - Reject patches that escape the project, touch protected paths, or lack a valid event and system decision.
+  - Do not bypass the child sandbox.

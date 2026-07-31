@@ -1,0 +1,19 @@
+id: decision-decode-git-quoted-paths
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Decode Git C-style quoted diff-header paths before autonomous proposal scope and protection checks.
+alternatives:
+  - id: reject-quoted-paths
+    assessment: Fails closed but excludes otherwise admissible repository paths containing spaces or quoted bytes.
+  - id: decode-git-quoting
+    assessment: Preserves fail-closed inspection while supporting Git C-style path identity.
+criteria:
+  - protected-path enforcement
+  - fail-closed malformed-input handling
+  - deterministic path identity
+  - repository path compatibility
+limits:
+  - Decoding establishes path identity only; it does not establish proposal admissibility or truth.
+  - Invalid escapes, invalid UTF-8, and malformed token boundaries remain unsupported.
+  - Patch application remains delegated to Git after structural gates pass.

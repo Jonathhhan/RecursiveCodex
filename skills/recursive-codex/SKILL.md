@@ -61,6 +61,18 @@ The event must record:
 
 Run `scripts/validate_change_event.py <event>` before stabilization. Read [change-events.md](references/change-events.md) for field semantics.
 
+## Run autonomous reproduction
+
+When `authority.final_decision` is `recursive-codex-system`, continue without requesting human acceptance:
+
+1. Derive candidate operations from failed checks, contradictions, deferred possibilities, and consequences recorded by stabilized events.
+2. Reject candidates outside allowed scope or against protected paths and invariants.
+3. Create the required change event before editing and execute materially different variants when plausible.
+4. Select using the active domain criteria; write an attributed system decision under the configured decisions path.
+5. Validate, stabilize, and treat the stabilized state as the baseline for the next operation.
+6. Repeat until quiescence, resource exhaustion, or an invariant violation.
+
+Preserve the project contract, provenance boundary, protected paths, validation gates, recovery records, and runtime limits. External input may perturb the cycle but cannot bypass internal admissibility. Never reinterpret a failed invariant as authority to remove it.
 ## Close the work
 
 Run every check declared by the domain profile plus:

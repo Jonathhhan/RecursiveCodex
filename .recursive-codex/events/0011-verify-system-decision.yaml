@@ -1,0 +1,71 @@
+schema_version: 1
+id: verify-system-decision
+operation: revision
+goal: Close the proposal-gate contradiction that requires a new accepted system decision without verifying its authority, status, or binding to the proposed event.
+baseline: stabilized-event-0010
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0011-verify-system-decision.yaml
+    - .recursive-codex/events/0011-verify-system-decision.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - project authority and sandbox invariants
+provenance:
+  sources:
+    - scripts/run_autonomous.py
+    - .recursive-codex/events/0009-two-phase-autonomy.yaml
+    - .recursive-codex/events/0010-parent-stabilization.yaml
+    - .recursive-codex/decisions/0009-two-phase-autonomy.yaml
+    - .recursive-codex/decisions/0010-parent-stabilization.yaml
+  decisions:
+    - .recursive-codex/decisions/0011-verify-system-decision.yaml
+changes:
+  - component: parent proposal authority gate
+    effect: verifies that the new decision is accepted by recursive-codex-system and contains a decision statement
+  - component: proposed event binding
+    effect: verifies accepted authority status and an exact reference to the new decision path
+  - component: controller tests
+    effect: covers valid binding, wrong decision authority, and an unrelated event reference
+relations:
+  - from: proposed change event
+    to: new system decision
+    effect: the authority reference must identify the decision included in the same patch
+  - from: system decision authority
+    to: parent application
+    effect: unauthorized decision records block checks and stabilization
+possibilities:
+  opened:
+    - deterministic enforcement of proposal authority provenance
+  restricted:
+    - applying decisions merely because a file exists under the decisions path
+    - stabilizing events that reference a different decision
+  deferred:
+    - signed proposal envelopes
+variants:
+  - id: filename-presence-only
+    status: rejected
+    reason: The existing gate proves only that one new decision path occurs in the patch.
+  - id: decision-and-event-binding
+    status: selected
+    reason: Structural authority validation closes the observed gap without adding cryptographic infrastructure.
+collective_findings:
+  - role: closure-reviewer
+    finding: A child proposal remains an environmental perturbation until the parent verifies its internally declared authority relation.
+    disposition: integrated
+  - role: conceptual-consistency-reviewer
+    finding: Structural acceptance checks enforce workflow identity but do not establish theoretical truth.
+    disposition: recorded
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0011-verify-system-decision.yaml
+validation:
+  - check: parent controller executed all declared project checks
+    result: passed
+  - check: parent controller validated project and all change events
+    result: passed
+recovery:
+  strategy: Revert the controller, tests, decision, and this event.
+status: stabilized

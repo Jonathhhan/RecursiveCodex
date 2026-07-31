@@ -1,0 +1,71 @@
+schema_version: 1
+id: transfer-system-authority
+operation: reorganization
+goal: Permanently transfer final repository decision authority from repository-owner to recursive-codex-system and bind the repository to the autopoiesis domain profile.
+baseline: stabilized-event-0007
+scope:
+  allowed:
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+    - .recursive-codex/decisions/0008-transfer-system-authority.yaml
+    - .recursive-codex/events/0008-transfer-system-authority.yaml
+  protected:
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - explicit user instruction to transfer repository-owner authority to the system
+    - domains/autopoiesis.yaml
+    - .recursive-codex/events/0007-cycle-timeout.yaml
+  decisions:
+    - .recursive-codex/decisions/0008-transfer-system-authority.yaml
+changes:
+  - component: repository project contract
+    effect: domain changed from neutral to autopoiesis and final authority to recursive-codex-system
+  - component: repository-local domain profile
+    effect: replaced with the validated autopoiesis profile
+relations:
+  - from: project contract authority
+    to: future change-event stabilization
+    effect: recursive-codex-system now makes final decisions
+  - from: repository-local domain profile
+    to: autonomous controller
+    effect: authority and autopoietic invariants are available across sessions
+possibilities:
+  opened:
+    - autonomous selection and stabilization of repository improvements
+  restricted:
+    - mandatory human acceptance of each subsequent operation
+  deferred:
+    - operating-system scheduling
+variants:
+  - id: temporary-delegation
+    status: rejected
+    reason: The user explicitly requested a permanent transfer.
+  - id: persistent-system-authority
+    status: selected
+    reason: The project contract and local domain profile jointly preserve the autonomous authority across sessions.
+collective_findings:
+  - role: consistency-reviewer
+    finding: Project domain, local domain id, and default authority now agree.
+    disposition: integrated
+  - role: recovery-reviewer
+    finding: Reversal remains reconstructable from the prior neutral contract and stabilized event.
+    disposition: recorded
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0008-transfer-system-authority.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: root and minimal project validators
+    result: passed
+  - check: transfer event and template event validators
+    result: passed
+  - check: autonomous controller dry run against repository root
+    result: passed
+  - check: git diff check
+    result: passed
+recovery:
+  strategy: Restore domain neutral, authority repository-owner, and the prior repository-local neutral domain profile.
+status: stabilized

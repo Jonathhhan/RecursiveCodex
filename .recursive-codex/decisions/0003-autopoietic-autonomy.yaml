@@ -1,0 +1,11 @@
+id: decision-autopoietic-autonomy
+date: 2026-07-31
+status: accepted
+authority: repository-owner
+decision: Accept the optional fully autonomous autopoiesis profile and autonomous reproduction workflow.
+scope:
+  - autopoiesis domain profile
+  - autonomous workflow instructions
+  - theoretical and technical boundary documentation
+limits:
+  - Acceptance does not authorize bypassing sandbox or protected-path invariants.

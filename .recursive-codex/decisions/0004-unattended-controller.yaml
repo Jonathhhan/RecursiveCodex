@@ -1,0 +1,10 @@
+id: decision-unattended-controller
+date: 2026-07-31
+status: accepted
+authority: repository-owner
+decision: Accept the workspace-sandboxed unattended controller for projects governed by recursive-codex-system.
+scope:
+  - autonomous controller
+  - controller tests
+limits:
+  - Do not bypass the sandbox or install operating-system scheduling without separate authorization.

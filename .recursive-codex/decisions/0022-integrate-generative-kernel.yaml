@@ -1,0 +1,20 @@
+id: decision-integrate-generative-kernel
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Integrate append-only strategic memory with the autonomous controller while retaining the controller as the sole proposal validation and stabilization boundary.
+alternatives:
+  - id: prompt-only-memory
+    assessment: Supplies strategic context but loses proposal failures when the controller rolls repository changes back.
+  - id: controller-journal-integration
+    assessment: Replays goals before selection and records attempts and outcomes outside rollback-sensitive proposal state.
+criteria:
+  - persistent failure memory
+  - deterministic strategic selection
+  - protected proposal and stabilization boundaries
+  - explicit blocked and quiescent states
+limits:
+  - Journal events are declared operational memory and do not establish truth or normative legitimacy.
+  - Empty journals preserve repository-derived candidate selection.
+  - The controller does not create goals implicitly.
+  - Strategic selection cannot bypass project checks, protected paths, authority records, or rollback.

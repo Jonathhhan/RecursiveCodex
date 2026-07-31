@@ -1,0 +1,55 @@
+schema_version: 1
+id: generate-hyperspace
+operation: composition
+goal: Add a domain-neutral, iterative generator for bounded multidimensional possibility spaces.
+baseline: stabilized event .recursive-codex/events/0012-windows-patch-normalization.yaml
+scope:
+  allowed:
+    - scripts/generate_hyperspace.py
+    - tests/test_hyperspace.py
+    - examples/hyperspace-improvisation.json
+    - docs/HYPERSPACE.md
+    - .recursive-codex/decisions/0013-select-hyperspace-strategy.yaml
+    - .recursive-codex/events/0013-generate-hyperspace.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - user request to proceed iteratively and generate a hyperspace
+    - docs/ARCHITECTURE.md
+  decisions:
+    - .recursive-codex/decisions/0013-select-hyperspace-strategy.yaml
+changes: []
+relations: []
+possibilities:
+  opened:
+    - exhaustive generation for small spaces
+    - bounded iterative generation for autonomous exploration
+  restricted:
+    - unbounded combinatorial expansion
+  deferred:
+    - adaptive scoring learned from stabilized events
+variants:
+  - id: exhaustive
+    distinction: Generate the complete Cartesian product when it fits the node budget.
+  - id: frontier
+    distinction: Expand one dimension per iteration and retain the best bounded frontier.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0013-select-hyperspace-strategy.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 31 tests
+  - check: python scripts/validate_project.py .
+    result: passed
+  - check: python scripts/validate_change_event.py templates/change-event.yaml
+    result: passed
+  - check: bounded improvisation hyperspace generation
+    result: passed with 81 theoretical and 12 retained possibilities
+recovery:
+  strategy: Remove the files introduced by this event.
+status: stabilized

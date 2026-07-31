@@ -1,0 +1,83 @@
+schema_version: 1
+id: discourse-revocation-semantics
+operation: revision
+goal: Preserve stabilized discourse as historical evidence while making explicitly revoked evidence inadmissible for normative goals.
+baseline: stabilized event .recursive-codex/events/0025-discourse-gated-normative-goals.yaml
+scope:
+  allowed:
+    - scripts/validate_discourse.py
+    - scripts/generative_kernel.py
+    - tests/test_discourse.py
+    - tests/test_generative_kernel.py
+    - docs/COMMUNICATIVE_ACTION.md
+    - docs/GENERATIVE_KERNEL.md
+    - .recursive-codex/decisions/0026-discourse-revocation-semantics.yaml
+    - .recursive-codex/events/0026-discourse-revocation-semantics.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - .recursive-codex/events/0016-communicative-action-profile.yaml
+    - .recursive-codex/events/0021-generative-kernel.yaml
+    - .recursive-codex/events/0025-discourse-gated-normative-goals.yaml
+    - .recursive-codex/decisions/0025-discourse-gated-normative-goals.yaml
+    - domains/communicative-action.yaml
+    - scripts/validate_discourse.py
+    - scripts/generative_kernel.py
+    - docs/ARCHITECTURE.md
+  decisions:
+    - .recursive-codex/decisions/0016-select-discourse-profile.yaml
+    - .recursive-codex/decisions/0021-generative-kernel.yaml
+    - .recursive-codex/decisions/0025-discourse-gated-normative-goals.yaml
+    - .recursive-codex/decisions/0026-discourse-revocation-semantics.yaml
+changes:
+  - component: discourse validation
+    effect: validates an optional explicit revocation status, reason, and responsible authority without invalidating accepted historical closure
+  - component: normative goal admission
+    effect: rejects structurally valid discourse evidence whose revocation status is revoked
+  - component: journal replay
+    effect: reapplies revocation during replay so previously admitted normative goals cannot remain selectable after their evidence is revoked
+  - component: tests and documentation
+    effect: distinguish historical structural validity from current normative admissibility
+relations:
+  - from: accepted discourse closure
+    to: historical provenance
+    effect: accepted closure remains intact and reconstructable after revocation
+  - from: discourse revocation
+    to: normative goal gate
+    effect: later loss of normative force becomes an explicit deterministic exclusion
+  - from: journal replay
+    to: revoked evidence
+    effect: persistent strategic memory cannot preserve authority that its referenced evidence no longer carries
+possibilities:
+  opened:
+    - explicit withdrawal of normative authorization without erasing historical closure
+    - deterministic replay failure when normative evidence loses admissibility
+  restricted:
+    - rewriting historical closure to represent a later authority decision
+    - selecting normative goals backed by revoked evidence
+  deferred:
+    - supersession chains between discourse records
+    - append-only external revocation registries
+variants:
+  - id: rewrite-closure
+    status: rejected
+    reason: It conflates the historical acceptance decision with a later change in normative admissibility and weakens provenance.
+  - id: explicit-revocation-marker
+    status: selected
+    reason: It keeps accepted closure structurally valid while exposing current inadmissibility to deterministic validation and replay.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0026-discourse-revocation-semantics.yaml
+validation:
+  - check: parent controller executed all declared project checks
+    result: passed
+  - check: parent controller validated project and all change events
+    result: passed
+recovery:
+  strategy: Revert the revocation validator and kernel gate, tests, documentation, decision, and this event; stabilized discourse records and existing technical goals remain unchanged.
+status: stabilized

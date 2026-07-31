@@ -1,0 +1,12 @@
+id: decision-validate-domain-binding
+date: 2026-07-31
+status: accepted
+authority: repository-owner
+decision: Accept enforcement of the repository-local domain profile binding in project validation.
+scope:
+  - project validator domain binding
+  - validator regression tests
+  - minimal example domain profile
+limits:
+  - This decision does not introduce a general domain-profile schema.
+  - Validator success does not establish domain truth.

@@ -1,0 +1,10 @@
+id: decision-autonomous-cycle-timeout
+date: 2026-07-31
+status: accepted
+authority: repository-owner
+decision: Accept a configurable timeout for each unattended autonomous child operation.
+scope:
+  - autonomous controller
+  - controller regression tests
+limits:
+  - A timeout stops the controller and must not be reinterpreted as successful stabilization.

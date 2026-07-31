@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["status", "summary", "patch"],
+  "properties": {
+    "status": {"enum": ["quiescent", "proposal"]},
+    "summary": {"type": "string"},
+    "patch": {"type": "string"}
+  },
+  "additionalProperties": false
+}

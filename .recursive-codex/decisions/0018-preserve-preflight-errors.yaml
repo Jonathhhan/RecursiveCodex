@@ -1,0 +1,16 @@
+id: decision-preserve-preflight-errors
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Accumulate no-path diagnostics with all other proposal preflight errors instead of returning early.
+alternatives:
+  - id: early-return
+    assessment: Simple but discards the causal header diagnostic observed in two failed cycles.
+  - id: accumulated-errors
+    assessment: Preserves complete feedback without weakening rejection.
+criteria:
+  - fail-closed behavior
+  - complete diagnostics
+  - deterministic autonomous recovery
+limits:
+  - Complete diagnostics do not themselves provide persistent failure memory.

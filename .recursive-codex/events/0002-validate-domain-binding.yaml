@@ -1,0 +1,68 @@
+schema_version: 1
+id: validate-domain-binding
+operation: revision
+goal: Reject project contracts whose repository-local domain profile is missing, malformed, or inconsistent with the declared domain.
+baseline: git:HEAD
+scope:
+  allowed:
+    - scripts/validate_project.py
+    - tests/test_validators.py
+    - examples/minimal-project/.recursive-codex/domain.yaml
+    - .recursive-codex/decisions/0002-validate-domain-binding.yaml
+    - .recursive-codex/events/0002-validate-domain-binding.yaml
+  protected:
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - skills/recursive-codex/SKILL.md
+    - docs/ARCHITECTURE.md
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+  decisions:
+    - .recursive-codex/decisions/0001-initial-core.yaml
+    - .recursive-codex/decisions/0002-validate-domain-binding.yaml
+changes:
+  - component: project validator
+    effect: validates the bound local domain profile fields consumed by the workflow
+  - component: validator tests
+    effect: covers missing and mismatched domain profiles
+  - component: minimal example
+    effect: includes the neutral domain profile declared by its contract
+relations:
+  - from: project contract domain
+    to: repository-local domain profile id
+    effect: equality is now enforced
+  - from: domain profile authority and checks
+    to: recursive workflow
+    effect: malformed declarations now block project validation
+possibilities:
+  opened:
+    - deterministic detection of broken project-to-domain bindings
+  restricted:
+    - accepting projects with absent or mismatched local domain profiles
+  deferred:
+    - a separate JSON Schema for domain profiles
+variants:
+  - id: identity-only
+    status: rejected
+    reason: Checking only the domain id would still allow malformed authority and checks declarations.
+  - id: minimal-profile-contract
+    status: selected
+    reason: Validate the profile fields consumed by the workflow without introducing a new schema version.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0002-validate-domain-binding.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: python scripts/validate_project.py .
+    result: passed
+  - check: python scripts/validate_project.py examples/minimal-project
+    result: passed
+  - check: python scripts/validate_change_event.py .recursive-codex/events/0002-validate-domain-binding.yaml
+    result: passed
+recovery:
+  strategy: Revert all files listed in scope.allowed, including the acceptance decision.
+status: stabilized

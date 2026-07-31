@@ -1,0 +1,56 @@
+schema_version: 1
+id: preserve-preflight-errors
+operation: revision
+goal: Preserve all autonomous proposal preflight errors when no patch paths can be discovered.
+baseline: stabilized event .recursive-codex/events/0017-complete-patch-path-discovery.yaml
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0018-preserve-preflight-errors.yaml
+    - .recursive-codex/events/0018-preserve-preflight-errors.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - two rolled-back autonomous quoted-path proposals
+    - scripts/run_autonomous.py
+  decisions:
+    - .recursive-codex/decisions/0018-preserve-preflight-errors.yaml
+changes:
+  - component: proposal preflight
+    effect: accumulates the no-path error instead of returning before other errors are reported
+  - component: regression test
+    effect: verifies simultaneous ambiguous-header and no-path diagnostics
+relations:
+  - from: header validation
+    to: autonomous feedback
+    effect: failed proposals retain the diagnostic needed for a corrected next proposal
+possibilities:
+  opened:
+    - autonomous correction informed by complete preflight diagnostics
+  restricted:
+    - repeated proposals caused by lost error information
+  deferred:
+    - persistent structured memory for rolled-back proposals
+variants:
+  - id: early-return
+    status: rejected
+    reason: It hides previously detected errors when path discovery is empty.
+  - id: accumulated-errors
+    status: selected
+    reason: It preserves fail-closed behavior and complete diagnostics.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0018-preserve-preflight-errors.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 45 tests
+  - check: parent validated project and change event
+    result: passed
+recovery:
+  strategy: Revert the controller, test, decision, and event.
+status: stabilized

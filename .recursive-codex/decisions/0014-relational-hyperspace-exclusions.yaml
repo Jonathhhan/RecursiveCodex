@@ -1,0 +1,18 @@
+id: decision-relational-hyperspace-exclusions
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Accept declarative exclusions that remove relationally incompatible hyperspace combinations during generation.
+alternatives:
+  - id: post-generation-filtering
+    assessment: Simple, but wastes the bounded frontier on branches already known to be incompatible.
+  - id: incremental-exclusion
+    assessment: Removes a branch as soon as every referenced choice is available and records the effect per iteration.
+criteria:
+  - domain-neutral relational semantics
+  - deterministic output
+  - explicit consequence tracing
+  - preservation of resource bounds
+limits:
+  - Exclusions are declared constraints, not learned truths or domain-validity judgments.
+  - The raw Cartesian size remains the conservative exhaustive-strategy budget gate.

@@ -1,0 +1,73 @@
+schema_version: 1
+id: decode-git-quoted-paths
+operation: revision
+goal: Support Git-quoted proposal paths without allowing quoting to conceal protected or unsafe mutations.
+baseline: stabilized event .recursive-codex/events/0018-preserve-preflight-errors.yaml
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0019-decode-git-quoted-paths.yaml
+    - .recursive-codex/events/0019-decode-git-quoted-paths.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - .recursive-codex/events/0017-complete-patch-path-discovery.yaml
+    - .recursive-codex/events/0018-preserve-preflight-errors.yaml
+    - .recursive-codex/runtime/last-message.txt
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+  decisions:
+    - .recursive-codex/decisions/0017-complete-patch-path-discovery.yaml
+    - .recursive-codex/decisions/0018-preserve-preflight-errors.yaml
+    - .recursive-codex/decisions/0019-decode-git-quoted-paths.yaml
+changes:
+  - component: diff-header parser
+    effect: tokenizes unquoted and Git C-style quoted source and destination paths
+  - component: quoted-path decoder
+    effect: decodes named escapes and byte-valued octal escapes with strict UTF-8 validation
+  - component: proposal path gate
+    effect: applies protected and unsafe path checks to decoded path identities
+  - component: controller regression tests
+    effect: covers spaces, octal concealment attempts, and malformed escapes
+relations:
+  - from: Git path quoting
+    to: protected-path enforcement
+    effect: escaped spelling is normalized before scope checks compare path identity
+  - from: repository paths containing spaces
+    to: autonomous proposals
+    effect: valid quoted diff headers no longer force rejection
+  - from: malformed quoted paths
+    to: proposal application
+    effect: decoding ambiguity stops application before Git is invoked
+possibilities:
+  opened:
+    - autonomous proposals for admissible paths requiring Git quoting
+    - protection checks against octal-escaped path spellings
+  restricted:
+    - using malformed escapes or token boundaries to weaken path inspection
+  deferred:
+    - support for repositories whose path bytes are not valid UTF-8
+    - persistent structured memory for rolled-back proposals
+variants:
+  - id: reject-quoted-paths
+    status: rejected
+    reason: It preserves safety but unnecessarily excludes valid paths containing spaces and escaped bytes.
+  - id: decode-git-quoting
+    status: selected
+    reason: Strict decoding preserves fail-closed behavior while comparing the path identity represented by Git.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0019-decode-git-quoted-paths.yaml
+validation:
+  - check: parent controller executed all declared project checks
+    result: passed
+  - check: parent controller validated project and all change events
+    result: passed
+recovery:
+  strategy: Revert the controller, tests, decision, and this event.
+status: stabilized

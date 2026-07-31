@@ -82,6 +82,30 @@ class ProjectValidatorTests(unittest.TestCase):
     def test_minimal_example_project_is_valid(self):
         self.assertEqual(validate_project.validate(ROOT / "examples" / "minimal-project"), [])
 
+    def test_missing_domain_profile_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with mock.patch.object(sys, "argv", ["init_project.py", str(root)]):
+                self.assertEqual(init_project.main(), 0)
+            (root / ".recursive-codex" / "domain.yaml").unlink()
+            errors = validate_project.validate(root)
+        self.assertTrue(any("invalid domain profile" in error for error in errors))
+
+    def test_domain_profile_id_must_match_contract(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with mock.patch.object(sys, "argv", ["init_project.py", str(root)]):
+                self.assertEqual(init_project.main(), 0)
+            profile = root / ".recursive-codex" / "domain.yaml"
+            profile.write_text(
+                profile.read_text(encoding="utf-8").replace(
+                    "id: neutral", "id: research"
+                ),
+                encoding="utf-8",
+            )
+            errors = validate_project.validate(root)
+        self.assertIn("domain profile id must match project domain", errors)
+
     def test_parent_traversal_path_is_rejected(self):
         template = (ROOT / "templates" / "project.yaml").read_text(encoding="utf-8")
         template = template.replace("events: .recursive-codex/events", "events: ../events")

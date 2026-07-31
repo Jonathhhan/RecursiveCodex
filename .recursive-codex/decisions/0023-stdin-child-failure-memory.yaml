@@ -1,0 +1,16 @@
+id: decision-stdin-child-failure-memory
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Deliver autonomous prompts through standard input and persist child timeout or exit failures in the generative journal.
+alternatives:
+  - id: prompt-file
+    assessment: Avoids quoting but creates another full-prompt artifact.
+  - id: standard-input
+    assessment: Avoids shell parsing without persistent prompt content.
+criteria:
+  - Windows-safe transport
+  - persistent failure learning
+  - authority preservation
+limits:
+  - External termination before error handling may prevent recording.

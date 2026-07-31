@@ -1,0 +1,11 @@
+id: decision-parent-stabilization
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Assign application, declared checks, validation evidence, stabilization, and rollback exclusively to the parent controller.
+scope:
+  - autonomous controller
+  - controller regression tests
+limits:
+  - Child proposals must contain proposed events with empty validation.
+  - Any failed check or validator must restore the proposal state and reverse the patch.

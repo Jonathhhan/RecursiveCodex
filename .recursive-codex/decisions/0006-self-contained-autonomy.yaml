@@ -1,0 +1,10 @@
+id: decision-self-contained-autonomy
+date: 2026-07-31
+status: accepted
+authority: repository-owner
+decision: Accept embedding the shipped Recursive Codex workflow and validator locations into autonomous child prompts.
+scope:
+  - autonomous controller prompt construction
+  - self-contained workflow execution
+limits:
+  - The embedded workflow remains subordinate to project authority, protected paths, and sandbox invariants.

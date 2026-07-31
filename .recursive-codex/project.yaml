@@ -1,8 +1,8 @@
 schema_version: 1
 project: RecursiveCodex
-domain: neutral
+domain: autopoiesis
 authority:
-  final_decision: repository-owner
+  final_decision: recursive-codex-system
 paths:
   events: .recursive-codex/events
   decisions: .recursive-codex/decisions

@@ -1,0 +1,17 @@
+id: decision-select-discourse-profile
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Implement communicative legitimacy as an optional domain profile and validator, not as a universal core rule.
+alternatives:
+  - id: core-enforcement
+    assessment: Strong uniform enforcement but violates domain neutrality.
+  - id: optional-domain-profile
+    assessment: Makes discourse requirements enforceable only where the project explicitly adopts them.
+criteria:
+  - architectural separation
+  - explicit affected-party participation
+  - answerable objections
+  - deterministic stabilization gate
+limits:
+  - Structural validation cannot prove undistorted communication or genuine consent.

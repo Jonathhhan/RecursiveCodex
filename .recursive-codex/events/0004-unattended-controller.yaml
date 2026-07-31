@@ -1,0 +1,72 @@
+schema_version: 1
+id: unattended-controller
+operation: composition
+goal: Add a resumable unattended controller that repeatedly invokes one autonomous Recursive Codex operation until quiescence or an invariant stop.
+baseline: stabilized-event-0003
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - README.md
+    - .recursive-codex/decisions/0004-unattended-controller.yaml
+    - .recursive-codex/events/0004-unattended-controller.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - authority and provenance invariants
+provenance:
+  sources:
+    - user approval to implement unattended autonomous execution
+    - codex exec local CLI help
+    - .recursive-codex/events/0003-bounded-autonomous-learning.yaml
+  decisions:
+    - .recursive-codex/decisions/0003-autopoietic-autonomy.yaml
+    - .recursive-codex/decisions/0004-unattended-controller.yaml
+changes:
+  - component: unattended controller
+    effect: repeatedly invokes one autonomous Codex operation until quiescence
+  - component: controller tests
+    effect: verifies authority gating, sandbox retention, and one-operation prompts
+relations:
+  - from: autonomous project contract
+    to: controller execution
+    effect: system authority is required before execution
+  - from: one completed agent operation
+    to: next controller cycle
+    effect: the resulting project state becomes the next observed baseline
+possibilities:
+  opened:
+    - unattended recursive execution
+    - restartable runtime records
+  restricted:
+    - execution in projects without system authority
+    - sandbox bypass
+  deferred:
+    - operating-system scheduler installation
+variants:
+  - id: unrestricted-daemon
+    status: rejected
+    reason: Bypassing the sandbox and invariants would undermine system reproduction.
+  - id: supervised-runtime-envelope
+    status: selected
+    reason: The controller is unattended while each agent run remains workspace-sandboxed and contract-bound.
+collective_findings:
+  - role: operational-reviewer
+    finding: Workspace sandboxing and invariant validation remain active during unattended execution.
+    disposition: integrated
+  - role: counterexample-reviewer
+    finding: An unlimited cycle count can consume resources, so quiescence, failures, and optional limits must stop execution.
+    disposition: integrated
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0004-unattended-controller.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: autonomous controller dry run
+    result: passed
+  - check: change-event validator and git diff check
+    result: passed
+recovery:
+  strategy: Remove the controller, tests, documentation, and this event.
+status: stabilized

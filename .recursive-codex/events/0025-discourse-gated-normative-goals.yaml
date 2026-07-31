@@ -1,0 +1,80 @@
+schema_version: 1
+id: discourse-gated-normative-goals
+operation: reorganization
+goal: Require explicit discourse evidence before the generative kernel admits a normative goal.
+baseline: stabilized event .recursive-codex/events/0024-native-stdin-launcher.yaml
+scope:
+  allowed:
+    - scripts/generative_kernel.py
+    - tests/test_generative_kernel.py
+    - docs/GENERATIVE_KERNEL.md
+    - .recursive-codex/decisions/0025-discourse-gated-normative-goals.yaml
+    - .recursive-codex/events/0025-discourse-gated-normative-goals.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - .recursive-codex/events/0016-communicative-action-profile.yaml
+    - .recursive-codex/events/0021-generative-kernel.yaml
+    - .recursive-codex/events/0022-integrate-generative-kernel.yaml
+    - .recursive-codex/events/0024-native-stdin-launcher.yaml
+    - .recursive-codex/runtime/generative-kernel.jsonl
+    - domains/communicative-action.yaml
+    - scripts/validate_discourse.py
+    - docs/ARCHITECTURE.md
+  decisions:
+    - .recursive-codex/decisions/0016-select-discourse-profile.yaml
+    - .recursive-codex/decisions/0021-generative-kernel.yaml
+    - .recursive-codex/decisions/0022-integrate-generative-kernel.yaml
+    - .recursive-codex/decisions/0025-discourse-gated-normative-goals.yaml
+changes:
+  - component: normative goal admission
+    effect: requires a referenced stabilized discourse event that passes structural discourse validation and contains a normative claim
+  - component: journal replay
+    effect: reapplies the discourse gate so invalidated or missing evidence becomes an invariant violation
+  - component: compatibility boundary
+    effect: preserves the replayed state shape and admission behavior of existing technical goals
+  - component: tests and documentation
+    effect: cover admitted, missing, unstabilized, invalid-kind, and legacy goal records
+relations:
+  - from: discourse event
+    to: normative goal
+    effect: participation, objections, reasons, and accepted closure become inspectable admission evidence
+  - from: discourse validator capability
+    to: strategic selection
+    effect: capability availability is supplemented by goal-specific evidence rather than treated as legitimacy itself
+  - from: replayed journal
+    to: protected authority boundary
+    effect: persistent memory cannot convert invalid normative evidence into an admissible operation or replace controller authority
+possibilities:
+  opened:
+    - provenance-bearing normative strategic goals
+    - deterministic rejection of missing or contested discourse evidence
+  restricted:
+    - admitting normative goals from capability availability alone
+    - treating technical priority as normative legitimacy
+  deferred:
+    - interactive participation adapters
+    - revocation and supersession semantics for stabilized discourse records
+variants:
+  - id: capability-only-gate
+    status: rejected
+    reason: It establishes only that a validator exists, not that the goal has passed a discourse process.
+  - id: referenced-discourse-gate
+    status: selected
+    reason: It preserves inspectable evidence and permits deterministic validation during admission and replay.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0025-discourse-gated-normative-goals.yaml
+validation:
+  - check: parent controller executed all declared project checks
+    result: passed
+  - check: parent controller validated project and all change events
+    result: passed
+recovery:
+  strategy: Revert the kernel admission gate, tests, documentation, decision, and this event; existing technical journal entries remain replayable.
+status: stabilized

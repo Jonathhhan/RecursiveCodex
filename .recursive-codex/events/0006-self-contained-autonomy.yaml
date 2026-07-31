@@ -1,0 +1,73 @@
+schema_version: 1
+id: self-contained-autonomy
+operation: revision
+goal: Remove the autonomous controller's runtime dependency on separate skill installation by embedding its own workflow and validator locations into each child prompt.
+baseline: stabilized-event-0005
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0006-self-contained-autonomy.yaml
+    - .recursive-codex/events/0006-self-contained-autonomy.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - sandbox and authority invariants
+provenance:
+  sources:
+    - user request to optimize autonomy
+    - end-to-end cycle finding that recursive-codex was unavailable in the child session
+    - skills/recursive-codex/SKILL.md
+  decisions:
+    - .recursive-codex/decisions/0005-windows-codex-resolution.yaml
+changes:
+  - component: autonomous prompt
+    effect: embeds the complete shipped Recursive Codex workflow
+  - component: validator routing
+    effect: supplies absolute project and event validator paths
+  - component: controller tests
+    effect: verifies workflow and validator presence in child prompts
+relations:
+  - from: plugin workflow source
+    to: autonomous child session
+    effect: each cycle receives the current local workflow snapshot
+  - from: child operation
+    to: plugin validators
+    effect: validation no longer depends on scripts existing in the target project
+possibilities:
+  opened:
+    - self-contained autonomous child sessions
+    - deterministic access to plugin validators
+  restricted:
+    - silent fallback to an improvised workflow
+  deferred:
+    - cryptographic verification of the embedded workflow
+variants:
+  - id: require-plugin-installation
+    status: rejected
+    reason: It leaves autonomy dependent on mutable external installation state.
+  - id: embed-workflow-snapshot
+    status: selected
+    reason: Each cycle receives the exact workflow shipped beside the controller.
+collective_findings:
+  - role: operational-reviewer
+    finding: The child session applied the embedded workflow without reporting a missing skill.
+    disposition: integrated
+  - role: counterexample-reviewer
+    finding: A deferred source-dependent operation remains inadmissible when required primary sources are absent.
+    disposition: confirmed autonomous restraint
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0006-self-contained-autonomy.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: self-contained autonomous end-to-end cycle
+    result: passed
+  - check: target project and stabilized event validation
+    result: passed
+  - check: quiescence without unauthorized mutation
+    result: passed
+recovery:
+  strategy: Revert the controller, tests, decision, and event.
+status: stabilized

@@ -52,6 +52,32 @@ def validate(root: Path) -> list[str]:
     if not isinstance(domain, str) or not DOMAIN_PATTERN.fullmatch(domain):
         errors.append("domain must contain lowercase letters, digits, and hyphens")
 
+    domain_path = root / ".recursive-codex" / "domain.yaml"
+    try:
+        domain_profile = load(domain_path)
+    except (OSError, ValueError) as exc:
+        errors.append(f"invalid domain profile: {exc}")
+        domain_profile = None
+
+    if domain_profile is not None:
+        if not isinstance(domain_profile, dict):
+            errors.append("domain profile must be a mapping")
+        else:
+            if domain_profile.get("schema_version") != 1:
+                errors.append("domain profile schema_version must be 1")
+            if isinstance(domain, str) and domain_profile.get("id") != domain:
+                errors.append("domain profile id must match project domain")
+            domain_authority = domain_profile.get("authority")
+            if not isinstance(domain_authority, dict) or not _is_non_empty_string(
+                domain_authority.get("default")
+            ):
+                errors.append("domain profile authority.default must be set")
+            domain_checks = domain_profile.get("checks")
+            if not isinstance(domain_checks, list) or not all(
+                _is_non_empty_string(item) for item in domain_checks
+            ):
+                errors.append("domain profile checks must be a list of non-empty strings")
+
     authority = data.get("authority")
     if not isinstance(authority, dict):
         errors.append("authority must be a mapping")

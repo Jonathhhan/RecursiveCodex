@@ -1,0 +1,70 @@
+schema_version: 1
+id: relational-hyperspace-exclusions
+operation: revision
+goal: Prevent declared relationally incompatible combinations from occupying generated hyperspace frontiers.
+baseline: stabilized event .recursive-codex/events/0013-generate-hyperspace.yaml
+scope:
+  allowed:
+    - scripts/generate_hyperspace.py
+    - tests/test_hyperspace.py
+    - docs/HYPERSPACE.md
+    - .recursive-codex/decisions/0014-relational-hyperspace-exclusions.yaml
+    - .recursive-codex/events/0014-relational-hyperspace-exclusions.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - .recursive-codex/events/0013-generate-hyperspace.yaml
+    - scripts/generate_hyperspace.py
+    - docs/HYPERSPACE.md
+  decisions:
+    - .recursive-codex/decisions/0013-select-hyperspace-strategy.yaml
+    - .recursive-codex/decisions/0014-relational-hyperspace-exclusions.yaml
+changes:
+  - component: hyperspace specification
+    effect: accepts validated mappings of relationally incompatible choices
+  - component: iterative generator
+    effect: prunes excluded branches when every referenced choice is available
+  - component: iteration history
+    effect: records generated and excluded counts separately
+  - component: generator tests
+    effect: covers pruning timing, incompatible results, and invalid references
+relations:
+  - from: declared exclusions
+    to: generated candidates
+    effect: incompatible branches cannot occupy the retained frontier
+  - from: pruning
+    to: iteration history
+    effect: relational consequences remain observable rather than being silently discarded
+possibilities:
+  opened:
+    - bounded exploration with declared cross-dimensional compatibility
+    - deterministic auditing of excluded branches
+  restricted:
+    - treating every Cartesian combination as admissible
+    - spending frontier capacity on declared incompatibilities
+  deferred:
+    - adaptive scoring learned from stabilized events
+    - richer conditional constraint expressions
+variants:
+  - id: post-generation-filtering
+    status: rejected
+    reason: It can spend the bounded frontier on branches that will later be discarded.
+  - id: incremental-exclusion
+    status: selected
+    reason: It applies relational constraints at the earliest deterministic iteration without introducing domain vocabulary.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0014-relational-hyperspace-exclusions.yaml
+validation:
+  - check: parent controller executed all declared project checks
+    result: passed
+  - check: parent controller validated project and all change events
+    result: passed
+recovery:
+  strategy: Revert the generator, tests, documentation, decision, and this event.
+status: stabilized

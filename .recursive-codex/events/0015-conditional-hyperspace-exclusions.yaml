@@ -1,0 +1,71 @@
+schema_version: 1
+id: conditional-hyperspace-exclusions
+operation: revision
+goal: Support explicit exceptions to relational hyperspace exclusions without premature pruning.
+baseline: stabilized event .recursive-codex/events/0014-relational-hyperspace-exclusions.yaml
+scope:
+  allowed:
+    - scripts/generate_hyperspace.py
+    - tests/test_hyperspace.py
+    - docs/HYPERSPACE.md
+    - .recursive-codex/decisions/0015-conditional-hyperspace-exclusions.yaml
+    - .recursive-codex/events/0015-conditional-hyperspace-exclusions.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - .recursive-codex/events/0014-relational-hyperspace-exclusions.yaml
+    - .recursive-codex/decisions/0014-relational-hyperspace-exclusions.yaml
+    - scripts/generate_hyperspace.py
+    - docs/HYPERSPACE.md
+  decisions:
+    - .recursive-codex/decisions/0014-relational-hyperspace-exclusions.yaml
+    - .recursive-codex/decisions/0015-conditional-hyperspace-exclusions.yaml
+changes:
+  - component: hyperspace exclusion syntax
+    effect: accepts backward-compatible when-unless conditional rules
+  - component: exclusion evaluation
+    effect: defers conditional pruning until all rule and exception dimensions are available
+  - component: generator tests
+    effect: covers exceptions, evaluation timing, and malformed conditional rules
+  - component: hyperspace documentation
+    effect: specifies conditional syntax and partial-state behavior
+relations:
+  - from: exception dimensions
+    to: pruning time
+    effect: branches remain observable until the exception can be decided
+  - from: legacy exclusions
+    to: conditional exclusions
+    effect: existing specifications remain valid while richer constraints are opened
+possibilities:
+  opened:
+    - concise relational constraints with explicit exceptions
+    - deterministic exception-aware frontier exploration
+  restricted:
+    - premature pruning before exception dimensions are observed
+    - implicit or inferred exceptions
+  deferred:
+    - adaptive scoring learned from stabilized events
+    - nested boolean constraint expressions
+variants:
+  - id: expand-legacy-rules
+    status: rejected
+    reason: Enumerating every non-exception option duplicates constraints and changes when dimensions gain options.
+  - id: conditional-exceptions
+    status: selected
+    reason: It expresses the relational exception directly while preserving deterministic partial-state evaluation.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0015-conditional-hyperspace-exclusions.yaml
+validation:
+  - check: parent controller executed all declared project checks
+    result: passed
+  - check: parent controller validated project and all change events
+    result: passed
+recovery:
+  strategy: Revert the generator, tests, documentation, decision, and this event.
+status: stabilized

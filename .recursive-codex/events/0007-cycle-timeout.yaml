@@ -1,0 +1,72 @@
+schema_version: 1
+id: autonomous-cycle-timeout
+operation: revision
+goal: Prevent an unattended autonomous child operation from hanging indefinitely by enforcing a configurable per-cycle timeout.
+baseline: stabilized-event-0006
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0007-cycle-timeout.yaml
+    - .recursive-codex/events/0007-cycle-timeout.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - repository-owner authority
+provenance:
+  sources:
+    - user instruction to improve the system autonomously
+    - observed autonomous cycle duration and resource-exhaustion invariant
+    - .recursive-codex/events/0006-self-contained-autonomy.yaml
+  decisions:
+    - .recursive-codex/decisions/0007-cycle-timeout.yaml
+changes:
+  - component: autonomous child execution
+    effect: enforces a configurable per-cycle timeout with a 900-second default
+  - component: controller command line
+    effect: adds cycle-timeout with zero as an explicit opt-out
+  - component: regression tests
+    effect: verifies TimeoutExpired returns control to the controller
+relations:
+  - from: child process lifetime
+    to: controller liveness
+    effect: a stalled child can no longer block the controller indefinitely
+  - from: timeout outcome
+    to: stabilization status
+    effect: timeout exits with status 124 and is never treated as success or quiescence
+possibilities:
+  opened:
+    - bounded recovery from stalled child operations
+  restricted:
+    - indefinitely hanging autonomous cycles
+  deferred:
+    - persistent transfer of repository authority
+variants:
+  - id: no-timeout
+    status: rejected
+    reason: A stalled child process could prevent quiescence and recovery forever.
+  - id: per-cycle-timeout
+    status: selected
+    reason: A configurable deadline preserves unattended operation while bounding resource consumption.
+collective_findings:
+  - role: operational-reviewer
+    finding: Cycle-count limits do not bound a single stalled child process.
+    disposition: integrated
+  - role: counterexample-reviewer
+    finding: A timeout must not be converted into a successful autonomous decision.
+    disposition: enforced by exit status 124
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0007-cycle-timeout.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: real child process timeout at 0.01 seconds
+    result: passed
+  - check: timeout returned exit status 124
+    result: passed
+  - check: project and change-event validators
+    result: passed
+recovery:
+  strategy: Revert the controller, tests, decision, and event.
+status: stabilized

@@ -1,0 +1,68 @@
+schema_version: 1
+id: complete-patch-path-discovery
+operation: revision
+goal: Prevent autonomous proposal rename or copy metadata from concealing mutations to protected paths.
+baseline: stabilized event .recursive-codex/events/0016-communicative-action-profile.yaml
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0017-complete-patch-path-discovery.yaml
+    - .recursive-codex/events/0017-complete-patch-path-discovery.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/events/0009-two-phase-autonomy.yaml
+    - .recursive-codex/events/0011-verify-system-decision.yaml
+    - .recursive-codex/events/0012-windows-patch-normalization.yaml
+  decisions:
+    - .recursive-codex/decisions/0009-two-phase-autonomy.yaml
+    - .recursive-codex/decisions/0011-verify-system-decision.yaml
+    - .recursive-codex/decisions/0017-complete-patch-path-discovery.yaml
+changes:
+  - component: proposal path discovery
+    effect: includes both paths declared by each unambiguous diff header
+  - component: proposal gate
+    effect: rejects unsupported or ambiguous diff path headers before invoking Git
+  - component: controller regression tests
+    effect: covers concealed protected renames and ambiguous quoted headers
+relations:
+  - from: diff rename and copy metadata
+    to: protected-path enforcement
+    effect: source and destination paths are now observed through the enclosing diff header
+  - from: ambiguous path syntax
+    to: proposal application
+    effect: ambiguity stops application instead of weakening the sandbox boundary
+possibilities:
+  opened:
+    - protected-path enforcement for metadata-only patch sections
+    - deterministic rejection of path syntax the proposal gate cannot safely interpret
+  restricted:
+    - combining an admissible edit with a concealed protected-path rename or copy
+    - applying quoted or otherwise ambiguous diff headers
+  deferred:
+    - a dedicated Git path-quoting decoder for autonomous proposals
+variants:
+  - id: metadata-specific-parsing
+    status: rejected
+    reason: Separate rename and copy parsers increase the chance that future Git metadata forms bypass path discovery.
+  - id: complete-diff-header-discovery
+    status: selected
+    reason: Both sides of an unambiguous diff header identify affected paths across ordinary and metadata-only changes.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0017-complete-patch-path-discovery.yaml
+validation:
+  - check: parent controller executed all declared project checks
+    result: passed
+  - check: parent controller validated project and all change events
+    result: passed
+recovery:
+  strategy: Revert the controller, tests, decision, and this event.
+status: stabilized

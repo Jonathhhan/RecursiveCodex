@@ -1,0 +1,17 @@
+id: decision-select-hyperspace-strategy
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Provide exhaustive and frontier strategies, with bounded frontier expansion as the default.
+alternatives:
+  - id: exhaustive
+    assessment: Complete and deterministic, but grows multiplicatively with every dimension.
+  - id: frontier
+    assessment: Preserves iterative traceability and a hard resource bound while exploring every dimension.
+criteria:
+  - domain-neutral core behavior
+  - deterministic output
+  - explicit iteration history
+  - enforceable resource limits
+limits:
+  - Scores are declared inputs, not claims of truth or intrinsic value.

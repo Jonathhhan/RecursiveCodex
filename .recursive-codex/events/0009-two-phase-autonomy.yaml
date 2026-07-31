@@ -1,0 +1,74 @@
+schema_version: 1
+id: two-phase-autonomy
+operation: reorganization
+goal: Separate autonomous proposal generation from validated parent-side application so Windows child-sandbox write failures cannot block admissible operations.
+baseline: stabilized-event-0008-plus-failed-autonomous-test
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - schemas/autonomous-result.schema.json
+    - .recursive-codex/decisions/0009-two-phase-autonomy.yaml
+    - .recursive-codex/events/0009-two-phase-autonomy.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - sandbox and authority invariants
+provenance:
+  sources:
+    - failed autonomous repository test recorded in .recursive-codex/runtime/last-message.txt
+    - user approval of the proposed two-stage procedure
+    - stabilized event 0008
+  decisions:
+    - .recursive-codex/decisions/0009-two-phase-autonomy.yaml
+changes:
+  - component: autonomous child sandbox
+    effect: changed from workspace-write to read-only
+  - component: autonomous result protocol
+    effect: requires schema-constrained quiescent or proposal JSON
+  - component: parent proposal gate
+    effect: rejects missing events, missing decisions, unsafe paths, protected paths, and invalid Git patches
+relations:
+  - from: read-only child analysis
+    to: parent application gate
+    effect: project mutation is separated from proposal generation
+  - from: protected project paths
+    to: proposal acceptance
+    effect: a protected-path match blocks application before Git is invoked
+possibilities:
+  opened:
+    - read-only autonomous proposal generation
+    - validated parent-side patch application
+  restricted:
+    - direct child mutation of the repository
+  deferred:
+    - signed proposal envelopes
+variants:
+  - id: sandbox-bypass
+    status: rejected
+    reason: It would remove a constitutive safety invariant.
+  - id: proposal-and-application
+    status: selected
+    reason: It preserves child isolation while allowing the trusted controller to validate and apply an admissible patch.
+collective_findings:
+  - role: operational-reviewer
+    finding: Schema-constrained read-only output works, but child-side write-requiring checks prevent proposal generation.
+    disposition: requires another revision
+  - role: provenance-reviewer
+    finding: Parent application must finalize validation evidence after checks rather than trusting evidence predicted by the child.
+    disposition: deferred before stabilization
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0009-two-phase-autonomy.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: structured read-only autonomous end-to-end cycle
+    result: passed
+  - check: protected-path and mandatory event-decision gate tests
+    result: passed
+  - check: autonomous proposal application
+    result: deferred
+recovery:
+  strategy: Revert the controller, tests, schema, decision, and event.
+status: stabilized

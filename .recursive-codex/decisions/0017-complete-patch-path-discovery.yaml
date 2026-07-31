@@ -1,0 +1,18 @@
+id: decision-complete-patch-path-discovery
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Require autonomous proposal inspection to account for paths declared by diff headers and reject ambiguous path headers before patch application.
+alternatives:
+  - id: metadata-specific-parsing
+    assessment: Parsing every rename and copy metadata form separately retains more patch syntax but creates multiple path-discovery surfaces that can diverge.
+  - id: complete-diff-header-discovery
+    assessment: Treating both sides of every unambiguous diff header as affected paths covers ordinary edits, additions, deletions, renames, and copies through one boundary.
+criteria:
+  - protected-path enforcement
+  - fail-closed ambiguity handling
+  - deterministic proposal inspection
+  - compatibility with existing repository paths
+limits:
+  - Ambiguous or quoted diff headers are rejected rather than reinterpreted.
+  - This structural inspection does not establish the admissibility or truth of patch contents.

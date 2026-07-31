@@ -1,0 +1,43 @@
+schema_version: 1
+id: example-discourse
+operation: revision
+goal: Demonstrate a communicatively gated decision.
+baseline: accepted brief
+scope: {}
+provenance: {}
+changes: []
+relations: []
+possibilities: {}
+authority:
+  required: true
+  status: accepted
+  reference: example decision
+validation:
+  - check: discourse gate
+    result: passed
+recovery:
+  strategy: Restore the accepted brief.
+status: stabilized
+discourse:
+  affected_roles:
+    - author
+    - editor
+  participants:
+    - author
+    - editor
+  claims:
+    - id: claim-clarity
+      kind: normative
+      reason: The revision should remain understandable to its intended readers.
+    - id: claim-structure
+      kind: technical
+      reason: The selected organization removes a circular dependency.
+  objections:
+    - id: objection-loss
+      claim: claim-clarity
+      status: addressed
+      reason: Compression may remove a necessary distinction.
+      response: The distinction remains explicit in the revised second paragraph.
+  closure:
+    status: accepted
+    reason: All affected roles participated and the recorded objection received a reasoned response.

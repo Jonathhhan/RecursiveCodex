@@ -1,0 +1,65 @@
+schema_version: 1
+id: windows-codex-resolution
+operation: revision
+goal: Make the autonomous controller resolve an executable Codex binary on Windows instead of attempting to spawn a PowerShell shim.
+baseline: stabilized-event-0004
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0005-windows-codex-resolution.yaml
+    - .recursive-codex/events/0005-windows-codex-resolution.yaml
+  protected:
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - failed end-to-end autonomous cycle
+    - local Get-Command and where.exe results
+  decisions:
+    - .recursive-codex/decisions/0004-unattended-controller.yaml
+    - .recursive-codex/decisions/0005-windows-codex-resolution.yaml
+changes:
+  - component: Windows command resolution
+    effect: invokes codex.ps1 through powershell.exe as an argument vector
+  - component: non-Git execution
+    effect: passes the supported skip-git-repo-check option
+  - component: regression tests
+    effect: covers Windows startup, sandboxing, and non-Git support
+relations:
+  - from: Python controller
+    to: local Codex CLI
+    effect: process startup now follows the executable PowerShell route
+  - from: initialized project contract
+    to: autonomous execution
+    effect: a Git repository is no longer an undeclared prerequisite
+possibilities:
+  opened:
+    - end-to-end autonomous execution on Windows
+  restricted:
+    - spawning a non-executable shell shim directly
+  deferred: []
+variants:
+  - id: shell-execution
+    status: rejected
+    reason: It expands quoting and command-injection risk.
+  - id: executable-resolution
+    status: selected
+    reason: Resolve codex.exe explicitly and retain argument-vector execution.
+collective_findings:
+  - role: operational-reviewer
+    finding: Shell-string execution is unnecessary; powershell.exe can receive the script and arguments separately.
+    disposition: integrated
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0005-windows-codex-resolution.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: one-cycle autonomous end-to-end execution
+    result: passed
+  - check: quiescence detection with no project mutation
+    result: passed
+recovery:
+  strategy: Revert the controller, test, and this event.
+status: stabilized

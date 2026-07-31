@@ -1,0 +1,8 @@
+{
+  "dimensions": [
+    {"id": "preparation", "options": [{"id": "minimal", "score": 1}, {"id": "repertoire", "score": 3}, {"id": "score", "score": 2}]},
+    {"id": "attention", "options": [{"id": "self", "score": 1}, {"id": "ensemble", "score": 3}, {"id": "environment", "score": 2}]},
+    {"id": "response", "options": [{"id": "continue", "score": 1}, {"id": "contrast", "score": 2}, {"id": "transform", "score": 3}]},
+    {"id": "correction", "options": [{"id": "persist", "score": 1}, {"id": "repair", "score": 3}, {"id": "restart", "score": 2}]}
+  ]
+}

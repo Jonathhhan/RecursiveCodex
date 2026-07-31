@@ -1,0 +1,61 @@
+schema_version: 1
+id: windows-patch-normalization
+operation: revision
+goal: Accept structurally valid autonomous patches across CRLF and LF context differences without ignoring semantic whitespace.
+baseline: rejected-proposal-0011
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0012-windows-patch-normalization.yaml
+    - .recursive-codex/events/0012-windows-patch-normalization.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - project authority and sandbox invariants
+provenance:
+  sources:
+    - .recursive-codex/runtime/proposal.patch
+    - strict and relaxed git apply check results
+  decisions:
+    - .recursive-codex/decisions/0012-windows-patch-normalization.yaml
+changes:
+  - component: parent Git patch gate
+    effect: uses recount and ignore-space-change for check, application, and reversal
+relations:
+  - from: Windows line endings
+    to: autonomous patch context
+    effect: CRLF and LF differences no longer cause false rejection
+possibilities:
+  opened:
+    - application of line-ending-compatible autonomous patches
+  restricted:
+    - rejection caused only by CRLF and LF context differences
+  deferred: []
+variants:
+  - id: ignore-all-whitespace
+    status: rejected
+    reason: It could conceal semantically significant Python indentation changes.
+  - id: recount-and-ignore-space-change
+    status: selected
+    reason: It tolerates Windows line-ending context while preserving stricter whitespace interpretation.
+collective_findings:
+  - role: operational-reviewer
+    finding: The previously rejected proposal passes recount with ignore-space-change.
+    disposition: integrated
+  - role: counterexample-reviewer
+    finding: ignore-whitespace would be broader and could hide Python indentation changes.
+    disposition: rejected
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0012-windows-patch-normalization.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: previously rejected proposal passes normalized git apply check
+    result: passed
+  - check: project and event validators
+    result: passed
+recovery:
+  strategy: Revert the controller, tests, decision, and event.
+status: stabilized

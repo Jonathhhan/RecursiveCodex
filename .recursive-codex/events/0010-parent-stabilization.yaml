@@ -1,0 +1,72 @@
+schema_version: 1
+id: parent-stabilization
+operation: revision
+goal: Complete two-phase autonomy by making the parent execute declared checks, record evidence, and stabilize an applied proposal or roll it back.
+baseline: tested-event-0009
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0010-parent-stabilization.yaml
+    - .recursive-codex/events/0009-two-phase-autonomy.yaml
+    - .recursive-codex/events/0010-parent-stabilization.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - project authority and sandbox invariants
+provenance:
+  sources:
+    - tested event 0009
+    - user instruction to implement the missing parent transition
+  decisions:
+    - .recursive-codex/decisions/0010-parent-stabilization.yaml
+changes:
+  - component: parent proposal application
+    effect: applies only new-event, new-decision, safe-path patches after git apply check
+  - component: declared check execution
+    effect: runs the pre-proposal project checks after application
+  - component: parent event finalization
+    effect: records passed evidence and changes proposed to stabilized
+  - component: rollback
+    effect: restores proposed event content and reverses the patch on failure
+relations:
+  - from: child proposal event
+    to: parent validation evidence
+    effect: the child cannot claim checks that only the parent can execute
+  - from: failed check
+    to: repository state
+    effect: failure triggers patch reversal rather than partial stabilization
+possibilities:
+  opened:
+    - end-to-end autonomous proposal application and stabilization
+  restricted:
+    - child-authored claims of completed validation
+  deferred:
+    - signed proposal envelopes
+variants:
+  - id: trust-child-evidence
+    status: rejected
+    reason: A read-only child cannot truthfully claim successful write-requiring checks.
+  - id: parent-owned-stabilization
+    status: selected
+    reason: The parent can apply, test, record evidence, and roll back within one controlled transition.
+collective_findings:
+  - role: provenance-reviewer
+    finding: Validation evidence is now authored only by the process that executed the checks.
+    disposition: integrated
+  - role: recovery-reviewer
+    finding: Proposed event bytes must be restored before reverse application.
+    disposition: integrated
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0010-parent-stabilization.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: focused parent proposal gate tests
+    result: passed
+  - check: project and event validators
+    result: passed
+recovery:
+  strategy: Revert the controller, tests, decision, and events 0009 and 0010.
+status: stabilized

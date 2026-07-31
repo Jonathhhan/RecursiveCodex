@@ -1,0 +1,79 @@
+schema_version: 1
+id: integrate-generative-kernel
+operation: reorganization
+goal: Connect persistent strategic selection and failure memory to autonomous execution without weakening proposal stabilization.
+baseline: stabilized event .recursive-codex/events/0021-generative-kernel.yaml
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - docs/GENERATIVE_KERNEL.md
+    - .recursive-codex/decisions/0022-integrate-generative-kernel.yaml
+    - .recursive-codex/events/0022-integrate-generative-kernel.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - .recursive-codex/events/0021-generative-kernel.yaml
+    - .recursive-codex/decisions/0021-generative-kernel.yaml
+    - scripts/generative_kernel.py
+    - scripts/run_autonomous.py
+    - docs/ARCHITECTURE.md
+  decisions:
+    - .recursive-codex/decisions/0021-generative-kernel.yaml
+    - .recursive-codex/decisions/0022-integrate-generative-kernel.yaml
+changes:
+  - component: autonomous cycle selection
+    effect: replays a non-empty runtime journal before each cycle and supplies the selected goal and failed strategies to the child operation
+  - component: controller termination
+    effect: reports strategic blocked and quiescent states without invoking a child operation
+  - component: persistent operational memory
+    effect: records rejected proposals as failed attempts and stabilized proposals as successful attempts with outcomes
+  - component: tests and documentation
+    effect: covers selected context, prompt propagation, and empty-journal compatibility
+relations:
+  - from: failed proposal validation
+    to: later strategic selection
+    effect: the failed strategy and controller evidence remain visible after repository rollback
+  - from: selected strategic goal
+    to: child candidate derivation
+    effect: declared priority constrains which admissible repository consequence is considered first
+  - from: parent stabilization boundary
+    to: strategic outcome
+    effect: a goal completes only after the controller accepts and stabilizes its proposal
+  - from: empty strategic journal
+    to: existing autonomous behavior
+    effect: repository-derived candidate selection remains available without implicit goal creation
+possibilities:
+  opened:
+    - persistent cross-cycle avoidance of recorded failed strategies
+    - deterministic execution of explicitly declared strategic goals
+    - explicit controller-level blocked and strategic quiescent states
+  restricted:
+    - treating rollback as erasure of operational failure memory
+    - allowing strategic selection to replace proposal validation
+  deferred:
+    - discourse-gated normative goal admission
+    - automatic derivation of journal goals from stabilized event possibilities
+    - retention and compaction policy for long-running journals
+variants:
+  - id: prompt-only-memory
+    status: rejected
+    reason: It cannot persist controller rejection evidence across rollback.
+  - id: controller-journal-integration
+    status: selected
+    reason: It preserves append-only failure memory while leaving authority and stabilization with the existing controller boundary.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0022-integrate-generative-kernel.yaml
+validation:
+  - check: parent controller executed all declared project checks
+    result: passed
+  - check: parent controller validated project and all change events
+    result: passed
+recovery:
+  strategy: Revert the controller integration, tests, documentation, decision, and this event; retain or archive the append-only runtime journal as provenance.
+status: stabilized

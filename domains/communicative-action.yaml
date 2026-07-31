@@ -1,0 +1,26 @@
+schema_version: 1
+id: communicative-action
+description: Optional profile for projects that require decisions to remain answerable to affected participants.
+authority:
+  default: discourse-accepted-authority
+vocabulary:
+  reserved:
+    - communicative-action
+    - validity-claim
+    - affected-participant
+    - objection
+    - discourse-closure
+source_policy:
+  require_primary_sources: true
+collective_roles:
+  - id: validity-claim-reviewer
+    mandate: Check whether factual, normative, and expressive claims have explicit reasons.
+  - id: inclusion-reviewer
+    mandate: Check whether affected roles can participate and raise objections.
+checks:
+  - python scripts/validate_discourse.py <event-file>
+limits:
+  - Validator success does not prove genuine consent or absence of coercion.
+  - Technical authority cannot silently resolve a normative objection.
+  - Stabilization requires affected roles to be represented among participants.
+  - Every addressed objection requires a reasoned response.

@@ -1,0 +1,19 @@
+id: decision-discourse-gated-normative-goals
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Require normative generative-kernel goals to reference a stabilized discourse event that passes the discourse validator and contains a normative claim.
+alternatives:
+  - id: capability-only-gate
+    assessment: Confirms validator availability but supplies no participation, objection, claim, or closure evidence for the goal.
+  - id: referenced-discourse-gate
+    assessment: Preserves an inspectable legitimacy record and revalidates it during admission and replay.
+criteria:
+  - discourse-legitimacy boundary
+  - deterministic replay
+  - provenance preservation
+  - compatibility with existing technical goals
+limits:
+  - Structural validation cannot prove genuine consent, equal participation, sincerity, or absence of coercion.
+  - The referenced discourse event remains subject to its declared authority and provenance.
+  - Technical goals retain the existing admission path and cannot silently supply normative justification.

@@ -1,0 +1,17 @@
+id: decision-native-stdin-launcher
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Resolve the Codex executable with the platform path resolver instead of preferring the PowerShell shim.
+alternatives:
+  - id: powershell-shim
+    assessment: Previously stabilized for argument transport but rejects the stdin invocation contract in the observed environment.
+  - id: native-path-match
+    assessment: Selects codex.CMD on Windows and preserves explicit executable paths on every platform.
+criteria:
+  - stdin compatibility
+  - deterministic argument-vector execution
+  - cross-platform behavior
+limits:
+  - Launcher availability remains an external runtime precondition.
+  - Explicitly supplied incompatible launchers remain the operator's responsibility.
