@@ -15,6 +15,14 @@ A collective is an advisory review graph, not a sovereign agent. Roles operate i
 
 ## Extension points
 
+## Effective checks
+
+The autonomous controller executes one effective ordered check list. Domain-profile checks run first and project-contract checks run second, all inside the same isolated candidate workspace. Both groups are bound into proposal attestation and stabilization evidence.
+
+Check identifiers are unique across both scopes. A project check cannot shadow or replace a domain check. The domain supplies invariant criteria; the project may add repository-specific criteria.
+
+Validation of check declarations does not count as their execution. `validate_project.py` rejects malformed or ambiguous declarations, while the autonomous controller executes the effective list before promotion.
+
 - Add a domain in `domains/<name>.yaml`.
 - Add deterministic domain checks to its `checks` list.
 - Extend schemas compatibly using a new schema version.

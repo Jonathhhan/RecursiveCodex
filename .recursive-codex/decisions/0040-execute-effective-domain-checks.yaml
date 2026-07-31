@@ -1,0 +1,21 @@
+id: decision-execute-effective-domain-checks
+date: 2026-08-01
+status: accepted
+authority: recursive-codex-system
+decision: Execute domain-profile checks before project-contract checks as one attested effective list in the isolated candidate workspace.
+alternatives:
+  - id: project-checks-only
+    assessment: Rejected because it validates domain declarations without enforcing them during autonomous promotion.
+  - id: project-overrides-domain
+    assessment: Rejected because shadowing would let a repository silently weaken domain invariants.
+  - id: ordered-effective-list
+    assessment: Selected because it preserves domain criteria, project extensions, deterministic order, and one execution boundary.
+criteria:
+  - domain checks are executed
+  - isolated execution is preserved
+  - attestation binds every effective check
+  - check identifiers cannot shadow across scopes
+limits:
+  - This change does not modularize the controller or project validator.
+  - Domain checks remain configured commands and inherit the existing command and ephemeral-output restrictions.
+event: .recursive-codex/events/0040-execute-effective-domain-checks.yaml

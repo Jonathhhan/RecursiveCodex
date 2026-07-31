@@ -32,6 +32,26 @@ class AutonomousControllerTests(unittest.TestCase):
             )
         )
 
+    def test_effective_checks_execute_domain_before_project(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            profile = root / ".recursive-codex" / "domain.yaml"
+            profile.parent.mkdir()
+            profile.write_text(
+                "schema_version: 1\nid: neutral\nauthority:\n  default: owner\n"
+                "checks:\n  - id: domain-check\n    command:\n      - domain-command\n"
+                "    ephemeral_outputs: []\n",
+                encoding="utf-8",
+            )
+            checks = run_autonomous.effective_declared_checks(root, {
+                "checks": [{
+                    "id": "project-check", "command": ["project-command"],
+                    "ephemeral_outputs": [],
+                }]
+            })
+        self.assertEqual([item["id"] for item in checks],
+                         ["domain-check", "project-check"])
+
     def test_resolution_uses_native_path_match(self):
         with mock.patch.object(
             run_autonomous.shutil, "which", return_value="C:/npm/codex.CMD"

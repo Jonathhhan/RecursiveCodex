@@ -114,6 +114,7 @@ def validate(root: Path) -> list[str]:
         errors.append(f"invalid domain profile: {exc}")
         domain_profile = None
 
+    domain_checks: list[dict] = []
     if domain_profile is not None:
         if not isinstance(domain_profile, dict):
             errors.append("domain profile must be a mapping")
@@ -128,6 +129,8 @@ def validate(root: Path) -> list[str]:
             ):
                 errors.append("domain profile authority.default must be set")
             errors.extend(_validate_checks(root, domain_profile.get("checks"), "domain profile checks"))
+            if isinstance(domain_profile.get("checks"), list):
+                domain_checks = [item for item in domain_profile["checks"] if isinstance(item, dict)]
 
     authority = data.get("authority")
     if not isinstance(authority, dict):
@@ -161,6 +164,13 @@ def validate(root: Path) -> list[str]:
 
     errors.extend(_validate_checks(root, data.get("checks"), "checks", protected if isinstance(protected, list) else []))
 
+    project_checks = data.get("checks")
+    if isinstance(project_checks, list):
+        domain_ids = {item.get("id") for item in domain_checks if isinstance(item.get("id"), str)}
+        for index, check in enumerate(project_checks):
+            if isinstance(check, dict) and check.get("id") in domain_ids:
+                errors.append(
+                    f"checks[{index}].id duplicates a domain profile check id")
     return errors
 
 

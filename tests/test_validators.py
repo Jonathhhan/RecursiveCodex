@@ -157,6 +157,33 @@ class ProjectValidatorTests(unittest.TestCase):
             (target / "project.yaml").write_text(template, encoding="utf-8")
             errors = validate_project.validate(root)
         self.assertIn("checks[0] must be a mapping", errors)
+    def test_project_check_cannot_shadow_domain_check(self):
+        declaration = (
+            "checks:\n"
+            "  - id: shared-check\n"
+            "    command:\n"
+            "      - python\n"
+            "      - -m\n"
+            "      - unittest\n"
+            "    ephemeral_outputs: []"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with mock.patch.object(sys, "argv", ["init_project.py", str(root)]):
+                self.assertEqual(init_project.main(), 0)
+            contract = root / ".recursive-codex" / "project.yaml"
+            contract.write_text(
+                contract.read_text(encoding="utf-8").replace("checks: []", declaration),
+                encoding="utf-8",
+            )
+            profile = root / ".recursive-codex" / "domain.yaml"
+            profile.write_text(
+                profile.read_text(encoding="utf-8").replace("checks: []", declaration),
+                encoding="utf-8",
+            )
+            errors = validate_project.validate(root)
+        self.assertIn("checks[0].id duplicates a domain profile check id", errors)
+
 
 
 class InitializerTests(unittest.TestCase):

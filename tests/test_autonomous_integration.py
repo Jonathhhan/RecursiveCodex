@@ -105,7 +105,7 @@ status: proposed
             )
             stabilized = (project / event_path).read_text(encoding="utf-8")
             self.assertIn("status: stabilized", stabilized)
-            self.assertIn("parent controller executed all declared project checks", stabilized)
+            self.assertIn("parent controller executed all effective domain and project checks", stabilized)
 
 
 if __name__ == "__main__":

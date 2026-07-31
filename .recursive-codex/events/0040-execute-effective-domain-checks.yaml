@@ -1,0 +1,69 @@
+schema_version: 1
+id: execute-effective-domain-checks
+operation: revision
+goal: Close the architecture break between validated domain checks and checks executed by the autonomous controller.
+baseline: stabilized event .recursive-codex/events/0039-add-tractarian-representation-boundary.yaml
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - scripts/validate_project.py
+    - docs/ARCHITECTURE.md
+    - tests/test_autonomous.py
+    - tests/test_autonomous_integration.py
+    - tests/test_validators.py
+    - .recursive-codex/decisions/0040-execute-effective-domain-checks.yaml
+    - .recursive-codex/events/0040-execute-effective-domain-checks.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - schemas/project.schema.json
+provenance:
+  sources:
+    - user architecture review identifying that domain checks are validated but not executed
+    - docs/ARCHITECTURE.md
+    - scripts/run_autonomous.py
+    - scripts/validate_project.py
+  decisions:
+    - .recursive-codex/decisions/0040-execute-effective-domain-checks.yaml
+changes:
+  - component: controller check resolution
+    effect: combines domain checks followed by project checks before prompting, attestation, isolated execution, and stabilization
+  - component: project validation
+    effect: rejects project check identifiers that duplicate domain check identifiers
+  - component: stabilization evidence
+    effect: records execution of the effective domain and project check list
+relations:
+  - from: domain profile
+    to: isolated candidate executor
+    effect: domain invariants now participate in promotion rather than declaration alone
+  - from: effective checks
+    to: proposal attestation
+    effect: child and parent bind the same ordered identifiers
+possibilities:
+  opened:
+    - domain-specific invariant enforcement in autonomous cycles
+    - later extraction of check resolution into a controller module
+    - audit reporting over declared and executed checks
+  restricted:
+    - project shadowing of domain check identifiers
+    - promotion after project checks alone
+  deferred:
+    - controller package decomposition
+    - validator class decomposition
+    - project and decision graph audit
+variants:
+  - id: ordered-effective-list
+    status: selected
+    reason: It closes the enforcement gap without weakening candidate isolation or authority boundaries.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0040-execute-effective-domain-checks.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: project, minimal-project, and change-event validators plus git diff --check
+    result: passed 128 tests
+recovery:
+  strategy: Restore project-only check resolution and prior evidence text, remove cross-scope identifier validation and tests, restore architecture documentation, then remove this decision and event.
+status: stabilized
