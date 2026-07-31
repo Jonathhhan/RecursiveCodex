@@ -1,0 +1,72 @@
+schema_version: 1
+id: observe-selection-and-defer-continuation
+operation: revision
+goal: Implement productive restraint and structural learning from the recursively generated text about autonomous writing.
+baseline: stabilized event .recursive-codex/events/0036-bound-autopoietic-cycle-scheduler.yaml
+scope:
+  allowed:
+    - domains/autopoiesis/kernel.py
+    - domains/autopoiesis.yaml
+    - .recursive-codex/domain.yaml
+    - docs/AUTOPOIESIS.md
+    - tests/test_autopoietic_kernel.py
+    - .recursive-codex/decisions/0037-observe-selection-and-defer-continuation.yaml
+    - .recursive-codex/events/0037-observe-selection-and-defer-continuation.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - scripts/run_autonomous.py
+provenance:
+  sources:
+    - recursively generated text on autonomous writing, improvisation, memory, blind spots, and quiescence
+    - .recursive-codex/events/0034-separate-autopoietic-operation-layer.yaml
+    - .recursive-codex/events/0036-bound-autopoietic-cycle-scheduler.yaml
+    - docs/AUTOPOIESIS.md
+  decisions:
+    - .recursive-codex/decisions/0037-observe-selection-and-defer-continuation.yaml
+changes:
+  - component: deliberate quiescence
+    effect: permits an open tension to be deferred with an explicit internal reason
+  - component: second-order observation
+    effect: classifies generated selections as reproduction, variation, or reorganization under a declared distinction
+  - component: expectation condensation
+    effect: requires multiple unique selection observations and incorporates active expectations into later goal identities
+relations:
+  - from: open tension
+    to: quiescence
+    effect: non-continuation can be an operation rather than absence or failure
+  - from: prior selections
+    to: future goal identity
+    effect: repeated observations condense into structural context
+possibilities:
+  opened:
+    - detection of repetitive local variation
+    - structural preference for reorganization
+    - internally justified restraint
+  restricted:
+    - compulsory conversion of every tension into work
+    - unobserved optimization by external novelty metrics
+  deferred:
+    - expectation revision and revocation
+    - automatic yet policy-governed selection observation
+variants:
+  - id: compulsory-generation
+    status: rejected
+    reason: It would simulate movement even when no productive connection exists.
+  - id: explicit-second-order-operations
+    status: selected
+    reason: It turns reflection and restraint into replayable, attributable operations.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0037-observe-selection-and-defer-continuation.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 115 tests
+  - check: deliberate deferral, second-order selection observation, and expectation condensation tests
+    result: passed
+  - check: project and change-event validators plus git diff --check
+    result: passed
+recovery:
+  strategy: Remove second-order operations and tests, restore domain bindings and documentation, then remove this decision and event.
+status: stabilized

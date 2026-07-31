@@ -1,0 +1,72 @@
+schema_version: 1
+id: add-tractarian-representation-boundary
+operation: reorganization
+goal: Make the factual and representational commitments of autopoietic observations explicit and testable.
+baseline: stabilized event .recursive-codex/events/0038-formalize-observation-with-forms.yaml
+scope:
+  allowed:
+    - domains/autopoiesis/propositions.py
+    - domains/autopoiesis/kernel.py
+    - domains/autopoiesis.yaml
+    - .recursive-codex/domain.yaml
+    - docs/AUTOPOIESIS.md
+    - tests/test_propositions.py
+    - tests/test_autopoietic_kernel.py
+    - tests/test_autopoietic_bridge.py
+    - tests/test_autopoietic_cycle.py
+    - .recursive-codex/decisions/0039-add-tractarian-representation-boundary.yaml
+    - .recursive-codex/events/0039-add-tractarian-representation-boundary.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - scripts/run_autonomous.py
+provenance:
+  sources:
+    - Ludwig Wittgenstein, Tractatus Logico-Philosophicus, especially propositions 2.1, 2.12, 4.01, 4.06, and 7
+    - https://www.wittgensteinproject.org/w/index.php/Tractatus_Logico-Philosophicus_(static_tree-like_view)
+    - .recursive-codex/events/0038-formalize-observation-with-forms.yaml
+    - user request to implement a Tractatus layer
+  decisions:
+    - .recursive-codex/decisions/0039-add-tractarian-representation-boundary.yaml
+changes:
+  - component: proposition model
+    effect: validates relational possible states, complete one-to-one pictures, and evidence-bound truth statuses
+  - component: observation operation
+    effect: requires a known proposition in addition to a known form
+  - component: representation boundary
+    effect: makes operationally untestable subjects and deliberate silence replayable
+relations:
+  - from: proposition picture
+    to: autopoietic observation
+    effect: exposes which possible factual configuration an observation articulates
+  - from: representation limit
+    to: quiescence
+    effect: permits non-generation without disguising metaphysical attribution as fact
+possibilities:
+  opened:
+    - evidence-aware proposition revision
+    - contradiction analysis across tested pictures
+    - explicit separation of testable claims and representation limits
+  restricted:
+    - observations without declared factual structure
+    - goals derived from untestable metaphysical assertions
+  deferred:
+    - general first-order logic
+    - automated natural-language semantic parsing
+    - claims about consciousness or personhood
+variants:
+  - id: domain-proposition-layer
+    status: selected
+    reason: It adds inspectable representation while retaining the domain boundary.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0039-add-tractarian-representation-boundary.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: project and change-event validators plus git diff --check
+    result: passed 126 tests
+recovery:
+  strategy: Restore form-only observations, remove the proposition model and tests, restore profiles and documentation, then remove this decision and event.
+status: stabilized

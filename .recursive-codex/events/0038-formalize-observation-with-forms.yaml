@@ -1,0 +1,77 @@
+schema_version: 1
+id: formalize-observation-with-forms
+operation: reorganization
+goal: Give autopoietic observation an explicit calculus of distinction and indication rather than free-text labels.
+baseline: stabilized event .recursive-codex/events/0037-observe-selection-and-defer-continuation.yaml
+scope:
+  allowed:
+    - domains/autopoiesis/forms.py
+    - domains/autopoiesis/kernel.py
+    - domains/autopoiesis.yaml
+    - .recursive-codex/domain.yaml
+    - docs/AUTOPOIESIS.md
+    - tests/test_forms.py
+    - tests/test_autopoietic_kernel.py
+    - tests/test_autopoietic_bridge.py
+    - tests/test_autopoietic_cycle.py
+    - .recursive-codex/decisions/0038-formalize-observation-with-forms.yaml
+    - .recursive-codex/events/0038-formalize-observation-with-forms.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - scripts/run_autonomous.py
+provenance:
+  sources:
+    - George Spencer-Brown, Laws of Form, chapters 1, 2, and 12
+    - https://randolphdible.com/wp-content/uploads/2023/07/spencer-brown-laws-of-form-ch-1-2-12-and-notes.pdf
+    - .recursive-codex/events/0034-separate-autopoietic-operation-layer.yaml
+    - .recursive-codex/events/0037-observe-selection-and-defer-continuation.yaml
+    - user request to place autopoiesis and George Spencer-Brown in the theoretical foreground
+  decisions:
+    - .recursive-codex/decisions/0038-formalize-observation-with-forms.yaml
+changes:
+  - component: form calculus
+    effect: represents finite marked and unmarked spaces and normalizes calling and crossing
+  - component: distinction operation
+    effect: records different sides, an indicated side, expression, and resulting value
+  - component: re-entry
+    effect: creates a new form retaining source identity and declared entry side
+  - component: observation
+    effect: requires a valid form reference for first- and second-order observations
+relations:
+  - from: Spencer-Brown form
+    to: Luhmannian observation
+    effect: supplies the distinction-and-indication grammar used by recursive operations
+  - from: observation
+    to: autopoietic reproduction
+    effect: makes the operative form replayable before it contributes to tension and selection
+possibilities:
+  opened:
+    - comparison and equivalence of observation forms
+    - explicit histories of re-entered distinctions
+    - analysis of blind sides and changing indications
+  restricted:
+    - undeclared free-text distinctions in observations
+    - silent equation of form calculus and social autopoiesis
+  deferred:
+    - full primary algebra
+    - temporal oscillation semantics
+    - graphical rendering of nested forms
+variants:
+  - id: domain-form-calculus
+    status: selected
+    reason: It formalizes observation without importing domain theory into the general controller.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0038-formalize-observation-with-forms.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 119 tests
+  - check: calling, crossing, indication, re-entry, and form-reference integration tests
+    result: passed
+  - check: project and change-event validators plus git diff --check
+    result: passed
+recovery:
+  strategy: Restore free-text distinction fields, remove the form calculus and tests, restore profiles and documentation, then remove this decision and event.
+status: stabilized

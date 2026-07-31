@@ -1,6 +1,44 @@
 schema_version: 1
 id: autopoiesis
 description: Domain profile for interpreting recursive project operations through Luhmannian systems theory.
+operation_kernel:
+  path: domains/autopoiesis/kernel.py
+  form_calculus: domains/autopoiesis/forms.py
+  representation_model: domains/autopoiesis/propositions.py
+  representation_operations:
+    - state-of-affairs-configured
+    - proposition-formed
+    - proposition-tested
+    - representation-limit-observed
+    - silence-entered
+  observation_requires:
+    - form
+    - proposition
+  truth_statuses:
+    - confirmed
+    - refuted
+    - undetermined
+  form_operations:
+    - distinction-drawn
+    - form-reentered
+  reductions:
+    - calling
+    - crossing
+  journal: .recursive-codex/runtime/autopoiesis.jsonl
+  status: experimental
+  bridge: domains/autopoiesis/bridge.py
+  execution_journal: .recursive-codex/runtime/generative-kernel.jsonl
+  coupling: hash-bound-asymmetric
+  scheduler: domains/autopoiesis/cycle.py
+  observation_boundary: explicit
+  second_order_operations:
+    - continuation-deferred
+    - selection-observed
+    - expectation-condensed
+  selection_modes:
+    - reproduction
+    - variation
+    - reorganization
 authority:
   default: recursive-codex-system
 vocabulary:

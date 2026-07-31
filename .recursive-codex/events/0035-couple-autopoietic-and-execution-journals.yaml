@@ -1,0 +1,73 @@
+schema_version: 1
+id: couple-autopoietic-and-execution-journals
+operation: reorganization
+goal: Close the feedback cycle without allowing domain generation or controller outcomes to bypass internal mediation.
+baseline: stabilized event .recursive-codex/events/0034-separate-autopoietic-operation-layer.yaml
+scope:
+  allowed:
+    - domains/autopoiesis/kernel.py
+    - domains/autopoiesis/bridge.py
+    - domains/autopoiesis.yaml
+    - .recursive-codex/domain.yaml
+    - docs/AUTOPOIESIS.md
+    - tests/test_autopoietic_bridge.py
+    - .recursive-codex/decisions/0035-couple-autopoietic-and-execution-journals.yaml
+    - .recursive-codex/events/0035-couple-autopoietic-and-execution-journals.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - scripts/run_autonomous.py
+provenance:
+  sources:
+    - .recursive-codex/events/0034-separate-autopoietic-operation-layer.yaml
+    - docs/AUTOPOIESIS.md
+    - user acceptance of the bidirectional bridge
+  decisions:
+    - .recursive-codex/decisions/0035-couple-autopoietic-and-execution-journals.yaml
+changes:
+  - component: goal export
+    effect: binds each execution goal to the hash of its generating autopoietic operation
+  - component: export receipt
+    effect: records the execution-event hash in the autopoietic journal and reconciles interrupted retries
+  - component: outcome import
+    effect: converts outcomes for exported goals into deduplicated unobserved perturbations
+  - component: domain binding
+    effect: declares the bridge, both journals, and asymmetric coupling semantics
+relations:
+  - from: generated connection
+    to: execution goal
+    effect: preserves exact operational provenance across the journal boundary
+  - from: execution outcome
+    to: autopoietic continuation
+    effect: perturbs but does not directly determine the next operation
+possibilities:
+  opened:
+    - repeatable generation-execution-feedback cycles
+    - later scheduler automation without semantic collapse
+    - observation of recurring outcome patterns
+  restricted:
+    - duplicate goal export after partial failure
+    - identifier collision with unrelated execution goals
+    - direct conversion of outcomes into new goals
+  deferred:
+    - autonomous observation production
+    - continuous scheduler
+    - cross-journal transaction protocol
+variants:
+  - id: asymmetric-receipted-bridge
+    status: selected
+    reason: It realizes structural coupling while retaining operational closure on both sides.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0035-couple-autopoietic-and-execution-journals.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 110 tests at stabilization
+  - check: export binding, idempotence, collision, receipt, outcome import, and mediation tests
+    result: passed
+  - check: project and change-event validators plus git diff --check
+    result: passed
+recovery:
+  strategy: Remove the bridge and its tests, remove export operations from the domain kernel, restore domain bindings and documentation, then remove this decision and event.
+status: stabilized

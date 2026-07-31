@@ -1,0 +1,69 @@
+schema_version: 1
+id: bound-autopoietic-cycle-scheduler
+operation: composition
+goal: Coordinate one complete generation and execution interval while preserving the distinction between outcome perturbation and internal observation.
+baseline: stabilized event .recursive-codex/events/0035-couple-autopoietic-and-execution-journals.yaml
+scope:
+  allowed:
+    - domains/autopoiesis/cycle.py
+    - domains/autopoiesis.yaml
+    - .recursive-codex/domain.yaml
+    - docs/AUTOPOIESIS.md
+    - tests/test_autopoietic_cycle.py
+    - .recursive-codex/decisions/0036-bound-autopoietic-cycle-scheduler.yaml
+    - .recursive-codex/events/0036-bound-autopoietic-cycle-scheduler.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - scripts/run_autonomous.py
+provenance:
+  sources:
+    - .recursive-codex/events/0034-separate-autopoietic-operation-layer.yaml
+    - .recursive-codex/events/0035-couple-autopoietic-and-execution-journals.yaml
+    - docs/AUTOPOIESIS.md
+    - user request to continue toward autonomous cycling
+  decisions:
+    - .recursive-codex/decisions/0036-bound-autopoietic-cycle-scheduler.yaml
+changes:
+  - component: cycle scheduler
+    effect: sequences import, observation gate, generation, export, selection, one optional controller execution, and renewed import
+  - component: observation boundary
+    effect: blocks generation whenever an unobserved perturbation is present
+  - component: execution bound
+    effect: permits at most one controller cycle per scheduler invocation
+relations:
+  - from: orchestration time
+    to: operational reproduction
+    effect: coordinates operations without supplying their meaning
+  - from: controller outcome
+    to: next generated goal
+    effect: requires a separate observation and tension before continuation
+possibilities:
+  opened:
+    - supervised end-to-end autopoietic experiments
+    - later policy-governed observation adapters
+    - external recurring invocation of bounded cycles
+  restricted:
+    - unbounded recursive controller execution
+    - automatic equation of environmental outcome and internal observation
+  deferred:
+    - autonomous observation policies
+    - second-order expectation condensation
+variants:
+  - id: bounded-observation-boundary
+    status: selected
+    reason: It advances the feedback cycle while retaining theoretical and operational safeguards.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0036-bound-autopoietic-cycle-scheduler.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 113 tests
+  - check: execution-ready, one-cycle execution, outcome import, and observation-boundary tests
+    result: passed
+  - check: project and change-event validators plus git diff --check
+    result: passed
+recovery:
+  strategy: Remove the scheduler and tests, restore domain bindings and documentation, then remove this decision and event.
+status: stabilized

@@ -1,0 +1,76 @@
+schema_version: 1
+id: separate-autopoietic-operation-layer
+operation: reorganization
+goal: Restore the theoretical direction by separating safe execution governance from domain-specific autopoietic generation.
+baseline: stabilized event .recursive-codex/events/0033-bind-discourse-and-recover-locks.yaml
+scope:
+  allowed:
+    - domains/autopoiesis/kernel.py
+    - domains/autopoiesis.yaml
+    - .recursive-codex/domain.yaml
+    - docs/AUTOPOIESIS.md
+    - tests/test_autopoietic_kernel.py
+    - .recursive-codex/decisions/0034-separate-autopoietic-operation-layer.yaml
+    - .recursive-codex/events/0034-separate-autopoietic-operation-layer.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - scripts/run_autonomous.py
+provenance:
+  sources:
+    - docs/ARCHITECTURE.md
+    - docs/GENEALOGY.md
+    - docs/AUTOPOIESIS.md
+    - user diagnosis that implementation had diverged from the original theory
+    - user acceptance of a two-layer correction
+  decisions:
+    - .recursive-codex/decisions/0034-separate-autopoietic-operation-layer.yaml
+changes:
+  - component: architecture
+    effect: separates domain-neutral governance from autopoietic operation generation
+  - component: autopoiesis domain
+    effect: binds an experimental hash-chained journal and operation kernel
+  - component: internal generation
+    effect: derives deterministic connection goals only from internally recorded observations and tensions
+  - component: tests
+    effect: proves perturbations cannot directly become goals and generated goals cannot deviate from internal derivation
+relations:
+  - from: environmental perturbation
+    to: generated goal
+    effect: requires observation and tension operations as internal mediation
+  - from: autopoiesis domain
+    to: neutral controller
+    effect: remains separated until an explicit authority-preserving bridge is accepted
+possibilities:
+  opened:
+    - endogenous goal formation from system history
+    - second-order observation of recurring tensions
+    - audited transfer of generated connections into executable goals
+  restricted:
+    - direct conversion of prompts into autopoietic goals
+    - universalization of Luhmannian vocabulary in the core
+  deferred:
+    - automatic controller bridge
+    - expectation condensation across repeated tensions
+    - structural evolution of observation rules
+variants:
+  - id: security-controller-only
+    status: rejected
+    reason: It preserves safety but not the stronger generative research objective.
+  - id: domain-operation-layer
+    status: selected
+    reason: It allows theoretical development while keeping the execution boundary auditable.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0034-separate-autopoietic-operation-layer.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 107 tests
+  - check: autopoietic perturbation, observation, tension, derivation, persistence, and quiescence tests
+    result: passed
+  - check: project and change-event validators plus git diff --check
+    result: passed
+recovery:
+  strategy: Remove the domain operation kernel and tests, restore both domain profiles and documentation, then remove this decision and event.
+status: stabilized

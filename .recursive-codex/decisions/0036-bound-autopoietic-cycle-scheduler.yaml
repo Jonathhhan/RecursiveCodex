@@ -1,0 +1,19 @@
+id: decision-bound-autopoietic-cycle-scheduler
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Coordinate generation, export, one execution cycle, and outcome import with a bounded scheduler that stops at an explicit observation boundary.
+alternatives:
+  - id: infinite-self-loop
+    assessment: Rejected because automatic interpretation of outcomes would fabricate self-observation and risk unbounded execution.
+  - id: bounded-observation-boundary
+    assessment: Selected because orchestration advances the cycle without collapsing perturbation into observation.
+criteria:
+  - bounded autonomy
+  - theoretical consistency
+  - explicit state transitions
+  - failure containment
+limits:
+  - New observations are not automatically invented.
+  - Continuous operation requires an external scheduler to invoke bounded cycles.
+event: .recursive-codex/events/0036-bound-autopoietic-cycle-scheduler.yaml

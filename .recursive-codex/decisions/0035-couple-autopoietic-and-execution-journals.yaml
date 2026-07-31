@@ -1,0 +1,21 @@
+id: decision-couple-autopoietic-and-execution-journals
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Couple the autopoietic and execution journals through an idempotent hash-bound bridge that exports internally derived goals and imports execution outcomes only as unobserved perturbations.
+alternatives:
+  - id: direct-controller-import
+    assessment: Rejected because it would let domain state bypass execution admission and authority.
+  - id: shared-journal
+    assessment: Rejected because it would collapse distinct operational semantics and ownership.
+  - id: asymmetric-receipted-bridge
+    assessment: Selected because it preserves separation while closing the feedback cycle.
+criteria:
+  - operational separation
+  - deterministic provenance
+  - retry safety
+  - structural coupling
+limits:
+  - Scheduling remains external orchestration.
+  - Returned outcomes require a later observation before they can form another goal.
+event: .recursive-codex/events/0035-couple-autopoietic-and-execution-journals.yaml

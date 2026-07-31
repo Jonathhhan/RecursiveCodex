@@ -1,0 +1,21 @@
+id: decision-add-tractarian-representation-boundary
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Require autopoietic observations to articulate a possible state of affairs through a proposition and preserve explicit silence at declared representation limits.
+alternatives:
+  - id: form-only-observation
+    assessment: Rejected because a distinction alone does not expose what factual configuration the observation represents.
+  - id: unrestricted-language-generation
+    assessment: Rejected because fluent text can conceal untestable representational commitments.
+  - id: domain-proposition-layer
+    assessment: Selected because it adds testability without importing philosophical vocabulary into the neutral core.
+criteria:
+  - explicit representational structure
+  - evidence-bound truth status
+  - replayable limits
+  - domain isolation
+limits:
+  - The model is a finite technical operationalization, not a complete logical analysis of language.
+  - Confirmed means supported by declared evidence in this workflow, not philosophically certain.
+event: .recursive-codex/events/0039-add-tractarian-representation-boundary.yaml

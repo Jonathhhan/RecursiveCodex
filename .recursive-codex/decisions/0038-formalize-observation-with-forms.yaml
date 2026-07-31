@@ -1,0 +1,21 @@
+id: decision-formalize-observation-with-forms
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Ground autopoietic observations in explicit Spencer-Brown-inspired forms with marked and unmarked sides, indication, calling, crossing, and source-preserving re-entry.
+alternatives:
+  - id: free-text-distinction
+    assessment: Rejected because it cannot validate the form through which an observation is made.
+  - id: universal-form-core
+    assessment: Rejected because one theoretical formalization must not become mandatory for every domain.
+  - id: domain-form-calculus
+    assessment: Selected because it formalizes observation while preserving the neutral core boundary.
+criteria:
+  - explicit distinction and indication
+  - replayable form operations
+  - domain isolation
+  - theoretical restraint
+limits:
+  - The finite model does not implement every construction or interpretation in Laws of Form.
+  - Re-entry is represented as a source-bound recursive operation, not claimed as proof of indeterminacy.
+event: .recursive-codex/events/0038-formalize-observation-with-forms.yaml

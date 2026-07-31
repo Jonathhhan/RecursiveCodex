@@ -1,0 +1,21 @@
+id: decision-observe-selection-and-defer-continuation
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Let the autopoietic layer deliberately defer continuation, observe its own selections, and condense repeated second-order observations into expectations that shape later goal identities.
+alternatives:
+  - id: compulsory-generation
+    assessment: Rejected because it equates continued activity with productive reproduction.
+  - id: score-optimization
+    assessment: Rejected because an external novelty score would replace self-observation with metric control.
+  - id: explicit-second-order-operations
+    assessment: Selected because distinctions, observations, and expectations remain attributable operations.
+criteria:
+  - deliberate quiescence
+  - second-order observation
+  - structural learning
+  - non-optimizing autonomy
+limits:
+  - Classification remains an operation of the technical model, not consciousness.
+  - Condensed expectations influence goal identity but do not bypass authority or validation.
+event: .recursive-codex/events/0037-observe-selection-and-defer-continuation.yaml
