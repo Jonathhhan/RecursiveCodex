@@ -1,0 +1,23 @@
+id: decision-hash-chain-generative-journal
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Encode the generative journal as an atomically appended sequence-numbered SHA-256 hash chain and migrate legacy records with preserved source hashes.
+alternatives:
+  - id: conventional-jsonl
+    assessment: Rejected because edits, middle deletion, insertion, and reordering are not detected during replay.
+  - id: internal-hash-chain
+    assessment: Selected because deterministic replay can fail closed on altered history without external dependencies.
+  - id: signed-external-ledger
+    assessment: Deferred because it requires external key custody and authority infrastructure.
+criteria:
+  - tamper evidence
+  - deterministic replay
+  - atomic append ownership
+  - explicit legacy migration
+  - dependency-free implementation
+limits:
+  - A local hash chain is not a signature and does not authenticate its writer.
+  - Tail truncation cannot be proven without an externally anchored head hash.
+  - An attacker able to rewrite the complete journal can recompute the complete chain.
+event: .recursive-codex/events/0031-hash-chain-generative-journal.yaml

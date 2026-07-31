@@ -1,0 +1,79 @@
+schema_version: 1
+id: redact-sensitive-diagnostics
+operation: revision
+goal: Prevent retained failed-check diagnostics from persisting recognized credentials while preserving actionable bounded context.
+baseline: stabilized event .recursive-codex/events/0027-retain-validation-failure-diagnostics.yaml
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0028-redact-sensitive-diagnostics.yaml
+    - .recursive-codex/events/0028-redact-sensitive-diagnostics.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - .recursive-codex/runtime/generative-kernel.jsonl
+    - .recursive-codex/events/0010-parent-stabilization.yaml
+    - .recursive-codex/events/0022-integrate-generative-kernel.yaml
+    - .recursive-codex/events/0027-retain-validation-failure-diagnostics.yaml
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - docs/ARCHITECTURE.md
+  decisions:
+    - .recursive-codex/decisions/0010-parent-stabilization.yaml
+    - .recursive-codex/decisions/0022-integrate-generative-kernel.yaml
+    - .recursive-codex/decisions/0027-retain-validation-failure-diagnostics.yaml
+    - .recursive-codex/decisions/0028-redact-sensitive-diagnostics.yaml
+changes:
+  - component: validation diagnostic capture
+    effect: redacts labeled credentials, bearer tokens, private-key blocks, credential-bearing URLs, and inherited sensitive environment values before retention
+  - component: diagnostic resource control
+    effect: applies the existing tail-preserving bound only after redaction so truncation cannot prevent recognition of a complete secret
+  - component: regression tests
+    effect: covers each recognized credential form and verifies redaction precedes truncation
+relations:
+  - from: declared check process
+    to: proposal rollback feedback
+    effect: actionable output structure is retained without known credential values
+  - from: proposal rollback feedback
+    to: generative journal
+    effect: failed-strategy memory receives the redacted diagnostic rather than raw subprocess output
+  - from: redaction
+    to: diagnostic truncation
+    effect: sensitive patterns are removed while complete and only then subjected to the resource bound
+possibilities:
+  opened:
+    - safer retention of diagnostics from checks that print credential-bearing configuration
+    - extension with additional credential recognizers without changing journal structure
+  restricted:
+    - persistence of recognized credentials through controller errors and strategic failure memory
+    - redaction after truncation has fragmented a recognizable credential
+  deferred:
+    - configurable project-specific redaction patterns
+    - structured sensitivity annotations from declared checks
+variants:
+  - id: retain-raw-diagnostics
+    status: rejected
+    reason: It preserves the confidentiality defect introduced by retaining arbitrary failed-check output.
+  - id: redact-after-truncation
+    status: rejected
+    reason: Truncation can remove the label or delimiter needed to recognize a retained secret fragment.
+  - id: redact-before-retention
+    status: selected
+    reason: It preserves useful diagnostic structure, removes recognized values while complete, and retains the existing resource bound.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0028-redact-sensitive-diagnostics.yaml
+validation:
+  - check: parent controller executed all declared project checks
+    result: passed
+  - check: parent controller validated project and all change events
+    result: passed
+recovery:
+  strategy: Revert the redaction helper and its tests, then remove this decision and event; bounded raw diagnostic retention from event 0027 remains available.
+status: stabilized

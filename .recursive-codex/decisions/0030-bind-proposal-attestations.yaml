@@ -1,0 +1,21 @@
+id: decision-bind-proposal-attestations
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Require autonomous proposals to attest their selected goal, complete paths, declared checks, risk, recovery, record identities, baseline commit, and workspace digest, then verify every claim in the parent.
+alternatives:
+  - id: free-patch-envelope
+    assessment: Rejected because the parent must reconstruct intent from unstructured patch text and cannot detect inconsistent declarations.
+  - id: verified-proposal-attestation
+    assessment: Selected because explicit claims can be compared with parent-owned state and candidate records.
+criteria:
+  - parent-owned baseline
+  - exact scope binding
+  - explicit impact classification
+  - recovery and identity consistency
+  - fail-closed proposal admission
+limits:
+  - Self-declared risk cannot prove the absence of hidden impact.
+  - Critical proposals require external authority and are rejected by the autonomous path.
+  - Baseline binding does not cryptographically authenticate the local system role.
+event: .recursive-codex/events/0030-bind-proposal-attestations.yaml

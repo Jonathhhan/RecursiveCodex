@@ -147,7 +147,7 @@ class ProjectValidatorTests(unittest.TestCase):
             errors = validate_project.validate(root)
         self.assertIn("paths.protected[0] must stay inside the project", errors)
 
-    def test_checks_must_be_strings(self):
+    def test_checks_must_be_structured(self):
         template = (ROOT / "templates" / "project.yaml").read_text(encoding="utf-8")
         template = template.replace("checks: []", "checks:\n  - 42")
         with tempfile.TemporaryDirectory() as directory:
@@ -156,7 +156,7 @@ class ProjectValidatorTests(unittest.TestCase):
             target.mkdir()
             (target / "project.yaml").write_text(template, encoding="utf-8")
             errors = validate_project.validate(root)
-        self.assertIn("checks must be a list of non-empty strings", errors)
+        self.assertIn("checks[0] must be a mapping", errors)
 
 
 class InitializerTests(unittest.TestCase):

@@ -1,0 +1,23 @@
+id: decision-retain-validation-failure-diagnostics
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Capture bounded stdout and stderr from declared checks and retain those diagnostics in proposal failure feedback and generative failure memory.
+alternatives:
+  - id: generic-check-status
+    assessment: Preserves a small failure record but omits the evidence needed to distinguish and correct validation failures.
+  - id: unbounded-check-output
+    assessment: Preserves complete process output but permits checks to exhaust controller and journal resources.
+  - id: bounded-labeled-diagnostics
+    assessment: Preserves actionable stdout and stderr while constraining persistent diagnostic size.
+criteria:
+  - actionable failure memory
+  - deterministic rollback
+  - bounded resource use
+  - provenance preservation
+limits:
+  - Diagnostics report process output and do not establish domain truth.
+  - Output beyond the bound is truncated from the beginning so the most recent diagnostic context is retained.
+  - Successful check output is not persisted.
+  - The parent controller remains the sole validation and stabilization authority.
+event: .recursive-codex/events/0027-retain-validation-failure-diagnostics.yaml

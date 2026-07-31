@@ -1,6 +1,8 @@
 # Generative kernel
 
-The generative kernel adds persistent strategic memory without replacing the existing autonomous safety controller. It stores append-only JSON Lines events for goals, capabilities, attempts, and outcomes, then reconstructs state deterministically.
+The generative kernel adds persistent strategic memory without replacing the existing autonomous safety controller. It stores hash-chained JSON Lines events for goals, capabilities, attempts, and outcomes, then reconstructs state deterministically.
+
+Journal schema 2 assigns every event a monotone `sequence`, the preceding `previous_hash`, and an `event_hash` over canonical JSON. Replay verifies the complete chain and nondecreasing timestamps before interpreting any goal. Append operations use an exclusive sibling lock and flush each record to disk. Payloads cannot override chain metadata.
 
 Goals have strategic, tactical, or operational levels, explicit priority, and required capabilities. Selection prefers priority, then wider level, then stable identifier order. Failed strategies remain attached to later selections. A completed goal produces quiescence when no pending goal remains; unavailable capabilities produce an explicit blocked state.
 
@@ -27,3 +29,14 @@ An absent or empty runtime journal preserves the controller's existing repositor
 Runtime memory is deliberately outside proposal patches. It survives proposal rollback, while repository events and decisions remain subject to the normal proposal, validation, and stabilization gates.
 
 The kernel records declared operational memory. Its discourse gate checks structural admission evidence; it does not prove genuine consent, undistorted communication, truth, or unlimited authority.
+## Legacy migration and audit limits
+
+Schema-1 journals require an explicit one-time migration:
+
+```powershell
+python scripts/generative_kernel.py memory.jsonl migrate
+```
+
+Migration writes a temporary complete schema-2 chain, flushes it, atomically replaces the legacy file, and revalidates it. Every migrated event includes `legacy_event_hash`, the SHA-256 identity of its original record.
+
+The chain detects altered records, insertion, middle deletion, reordering, duplicate positions, and backward timestamps. It is tamper-evident rather than tamper-proof: it does not authenticate a writer, an attacker who rewrites the whole file can recompute hashes, and removal of the final suffix cannot be proven without an externally anchored head hash.

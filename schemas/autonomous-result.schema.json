@@ -5,7 +5,42 @@
   "properties": {
     "status": {"enum": ["quiescent", "proposal"]},
     "summary": {"type": "string"},
-    "patch": {"type": "string"}
+    "patch": {"type": "string"},
+    "selected_goal": {"type": ["string", "null"]},
+    "expected_paths": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "expected_checks": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "risk": {"enum": ["low", "medium", "high", "critical"]},
+    "recovery": {"type": "string", "minLength": 1},
+    "decision_id": {"type": "string", "minLength": 1},
+    "event_id": {"type": "string", "minLength": 1},
+    "baseline_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "workspace_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "proposal"}}},
+      "then": {
+        "required": [
+          "selected_goal",
+          "expected_paths",
+          "expected_checks",
+          "risk",
+          "recovery",
+          "decision_id",
+          "event_id",
+          "baseline_commit",
+          "workspace_digest"
+        ]
+      }
+    }
+  ]
 }

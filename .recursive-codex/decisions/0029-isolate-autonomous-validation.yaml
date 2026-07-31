@@ -1,0 +1,23 @@
+id: decision-isolate-autonomous-validation
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Evaluate autonomous proposals and structured checks in a disposable project copy, reject undeclared writes, verify real rollback, and serialize controllers with an atomic workspace lock.
+alternatives:
+  - id: in-place-shell-checks
+    assessment: Rejected because checks can mutate protected or undeclared paths after patch preflight.
+  - id: disposable-candidate-copy
+    assessment: Selected because check writes are measurable and disposable before the real workspace is changed.
+  - id: temporary-git-worktree
+    assessment: Deferred because it still shares repository administration state and complicates dirty-worktree evaluation.
+criteria:
+  - fail-closed validation
+  - real-workspace integrity
+  - deterministic check invocation
+  - rollback verification
+  - concurrency exclusion
+limits:
+  - A project copy is not an OS or network sandbox.
+  - Owner-declared check executables remain trusted capabilities.
+  - The local system authority is structural and not cryptographically authenticated.
+event: .recursive-codex/events/0029-isolate-autonomous-validation.yaml

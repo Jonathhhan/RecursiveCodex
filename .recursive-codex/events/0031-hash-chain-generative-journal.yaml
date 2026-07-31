@@ -1,0 +1,90 @@
+schema_version: 1
+id: hash-chain-generative-journal
+operation: revision
+goal: Make edits, insertion, middle deletion, reordering, duplicate sequence positions, and backward timestamps evident during journal replay.
+baseline: stabilized event .recursive-codex/events/0030-bind-proposal-attestations.yaml
+scope:
+  allowed:
+    - scripts/generative_kernel.py
+    - tests/test_generative_kernel.py
+    - tests/test_journal_integrity.py
+    - tests/test_autonomous.py
+    - docs/GENERATIVE_KERNEL.md
+    - .recursive-codex/runtime/generative-kernel.jsonl
+    - .recursive-codex/decisions/0031-hash-chain-generative-journal.yaml
+    - .recursive-codex/events/0031-hash-chain-generative-journal.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - external security review supplied by the repository owner
+    - .recursive-codex/events/0021-generative-kernel.yaml
+    - .recursive-codex/events/0022-integrate-generative-kernel.yaml
+    - .recursive-codex/events/0030-bind-proposal-attestations.yaml
+    - pre-migration schema-1 generative journal with 19 records
+  decisions:
+    - .recursive-codex/decisions/0031-hash-chain-generative-journal.yaml
+changes:
+  - component: journal event format
+    effect: adds monotone sequence, previous hash, and canonical event hash fields under schema version 2
+  - component: journal replay
+    effect: validates sequence, hash links, event hashes, and nondecreasing timestamps before state reconstruction
+  - component: append ownership
+    effect: serializes append operations with an atomic journal lock and flushes records to disk
+  - component: legacy migration
+    effect: atomically rewrites schema-1 records with a preserved source-record hash and validates the resulting chain
+  - component: reserved fields
+    effect: prevents payload callers from overriding chain metadata
+relations:
+  - from: prior event hash
+    to: next event
+    effect: history order becomes part of every subsequent digest
+  - from: legacy record
+    to: migrated event
+    effect: legacy_event_hash preserves a deterministic identity for the source representation
+  - from: journal lock
+    to: sequence allocation
+    effect: concurrent appenders cannot select the same next position
+possibilities:
+  opened:
+    - externally anchored journal heads
+    - signed checkpoints
+    - audit comparison across clones
+  restricted:
+    - silent middle-history mutation
+    - payload override of chain metadata
+    - implicit legacy interpretation
+  deferred:
+    - external signed head anchoring
+    - authenticated writer identities
+    - content-addressed discourse evidence
+variants:
+  - id: append-only-convention
+    status: rejected
+    reason: Filesystem mutability remains invisible to replay.
+  - id: internal-hash-chain
+    status: selected
+    reason: It detects common local history mutation while retaining dependency-free JSONL operation.
+collective_findings:
+  - role: external-security-reviewer
+    finding: Append-only behavior was conventional rather than manipulation-evident.
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0031-hash-chain-generative-journal.yaml
+validation:
+  - check: python -m unittest discover -s tests -q
+    result: passed 94 tests
+  - check: tamper, deletion, reorder, time, lock, migration, and reserved-field tests
+    result: passed
+  - check: migrate real schema-1 generative journal
+    result: migrated and validated 19 records
+  - check: replay and select real generative journal
+    result: passed with quiescent state
+  - check: project and event validators plus git diff --check
+    result: passed
+recovery:
+  strategy: Restore the pre-migration journal from version control together with schema-1 read and append behavior.
+status: stabilized

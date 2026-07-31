@@ -222,6 +222,108 @@ class AutonomousControllerTests(unittest.TestCase):
             self.assertIsNone(
                 run_autonomous.execute_child(["codex"], Path("project"), 1)
             )
+
+    def test_declared_check_failure_retains_stdout_and_stderr(self):
+        completed = run_autonomous.subprocess.CompletedProcess(
+            args="python check.py",
+            returncode=1,
+            stdout="first failing assertion\n",
+            stderr="validation traceback\n",
+        )
+        with mock.patch.object(
+            run_autonomous.subprocess, "run", return_value=completed
+        ) as process:
+            error = run_autonomous.declared_check_error(
+                {"id": "check", "command": ["python", "check.py"]}, Path("project"), 3
+            )
+        self.assertIn("declared check failed: check", error)
+        self.assertIn("stdout:\nfirst failing assertion", error)
+        self.assertIn("stderr:\nvalidation traceback", error)
+        process.assert_called_once_with(
+            ["python", "check.py"],
+            cwd=Path("project"),
+            check=False,
+            timeout=3,
+            capture_output=True,
+            text=True,
+        )
+
+    def test_declared_check_timeout_retains_partial_diagnostics(self):
+        timeout = run_autonomous.subprocess.TimeoutExpired(
+            "python check.py",
+            3,
+            output=b"partial output",
+            stderr=b"timeout detail",
+        )
+        with mock.patch.object(
+            run_autonomous.subprocess, "run", side_effect=timeout
+        ):
+            error = run_autonomous.declared_check_error(
+                {"id": "check", "command": ["python", "check.py"]}, Path("project"), 3
+            )
+        self.assertIn("declared check timed out: check", error)
+        self.assertIn("stdout:\npartial output", error)
+        self.assertIn("stderr:\ntimeout detail", error)
+
+    def test_validation_failure_diagnostic_is_bounded(self):
+        diagnostic = run_autonomous.validation_failure_diagnostic(
+            "early failure\n" + ("x" * 5000),
+            "final diagnostic",
+            limit=100,
+        )
+        self.assertIn("diagnostic truncated", diagnostic)
+        self.assertLessEqual(len(diagnostic), 160)
+        self.assertTrue(diagnostic.endswith("stderr:\nfinal diagnostic"))
+
+    def test_validation_diagnostic_redacts_recognized_credentials(self):
+        private_key = (
+            "-----BEGIN PRIVATE KEY-----\n"
+            "private-material\n"
+            "-----END PRIVATE KEY-----"
+        )
+        with mock.patch.dict(
+            run_autonomous.os.environ,
+            {"RECURSIVE_CODEX_API_TOKEN": "inherited-sensitive-value"},
+            clear=True,
+        ):
+            diagnostic = run_autonomous.validation_failure_diagnostic(
+                "password=hunter2\n"
+                "Authorization: Bearer abc.def-123\n"
+                "remote=https://alice:secret@example.test/repository\n"
+                f"key={private_key}\n"
+                "environment=inherited-sensitive-value",
+                None,
+            )
+        for secret in (
+            "hunter2",
+            "abc.def-123",
+            "alice:secret",
+            "private-material",
+            "inherited-sensitive-value",
+        ):
+            self.assertNotIn(secret, diagnostic)
+        self.assertIn("password=[REDACTED]", diagnostic)
+        self.assertIn("Bearer [REDACTED]", diagnostic)
+        self.assertIn("https://[REDACTED]@example.test/repository", diagnostic)
+        self.assertIn("[REDACTED PRIVATE KEY]", diagnostic)
+        self.assertIn("environment=[REDACTED ENV]", diagnostic)
+
+    def test_validation_diagnostic_redacts_before_truncation(self):
+        secret = "sensitive-value-that-must-not-survive"
+        with mock.patch.dict(
+            run_autonomous.os.environ,
+            {"SERVICE_SECRET": secret},
+            clear=True,
+        ):
+            diagnostic = run_autonomous.validation_failure_diagnostic(
+                None,
+                "context " + ("x" * 200) + secret,
+                limit=80,
+            )
+        self.assertNotIn(secret, diagnostic)
+        self.assertIn("[REDACTED ENV]", diagnostic)
+        self.assertIn("diagnostic truncated", diagnostic)
+
     def test_prompt_limits_each_invocation_to_one_operation(self):
         prompt = run_autonomous.autonomous_prompt(ROOT)
         self.assertIn("exactly one operation", prompt)
@@ -233,20 +335,10 @@ class AutonomousControllerTests(unittest.TestCase):
     def test_strategic_context_selects_persistent_goal(self):
         with tempfile.TemporaryDirectory() as directory:
             journal = Path(directory) / "journal.jsonl"
-            journal.write_text(
-                json.dumps(
-                    {
-                        "schema_version": 1,
-                        "kind": "goal-added",
-                        "time": "test",
-                        "id": "integrate",
-                        "level": "strategic",
-                        "priority": 10,
-                        "requires": [],
-                    }
-                )
-                + "\n",
-                encoding="utf-8",
+            run_autonomous.append_event(
+                journal,
+                "goal-added",
+                {"id": "integrate", "level": "strategic", "priority": 10, "requires": []},
             )
             selection = run_autonomous.strategic_context(journal)
         self.assertEqual(selection["status"], "selected")

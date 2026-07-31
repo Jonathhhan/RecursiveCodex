@@ -19,6 +19,7 @@ The cycle is recursive: review can reopen the problem, demand another variant, o
 - structured change events with provenance, alternatives, consequences, and decision status;
 - optional collectives of independent roles without majority truth;
 - deterministic initialization and validation scripts;
+- isolated autonomous proposal checks with structured commands, side-effect detection, verified rollback, and workspace locking;
 - a neutral example domain and unit tests.
 
 ## Quick start
@@ -42,6 +43,8 @@ domains/                        Reusable domain profiles
 scripts/                        Initialization and validation
 tests/                          Dependency-free test suite
 ```
+
+The autonomous controller's security and trust boundary is documented in `docs/AUTONOMOUS_SECURITY.md`.
 
 ## Genealogy and scope
 

@@ -1,0 +1,100 @@
+schema_version: 1
+id: isolate-autonomous-validation
+operation: reorganization
+goal: Close the controller boundary exposed by shell checks, in-place validation, unchecked rollback, and concurrent runtime files.
+baseline: stabilized event .recursive-codex/events/0028-redact-sensitive-diagnostics.yaml
+scope:
+  allowed:
+    - .recursive-codex/project.yaml
+    - schemas/project.schema.json
+    - domains/communicative-action.yaml
+    - scripts/validate_project.py
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - tests/test_autonomous_security.py
+    - tests/test_validators.py
+    - docs/AUTONOMOUS_SECURITY.md
+    - README.md
+    - .github/workflows/ci.yml
+    - .recursive-codex/decisions/0029-isolate-autonomous-validation.yaml
+    - .recursive-codex/events/0029-isolate-autonomous-validation.yaml
+  protected:
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - external security review supplied by the repository owner
+    - docs/ARCHITECTURE.md
+    - docs/GENEALOGY.md
+    - .recursive-codex/events/0028-redact-sensitive-diagnostics.yaml
+    - scripts/run_autonomous.py
+  decisions:
+    - .recursive-codex/decisions/0029-isolate-autonomous-validation.yaml
+changes:
+  - component: check contract
+    effect: replaces shell strings with validated command argument vectors and explicit allowed outputs
+  - component: candidate evaluation
+    effect: applies proposals and runs checks in a disposable project copy before touching the real workspace
+  - component: side-effect gate
+    effect: hashes the candidate tree around every check and rejects undeclared writes
+  - component: rollback
+    effect: verifies reverse-patch success and exact restoration or stops hard
+  - component: concurrency
+    effect: serializes controllers with an atomic PID and start-time lock
+  - component: trust boundary and CI
+    effect: documents residual limits and validates the repository contract on CI
+relations:
+  - from: owner-declared check
+    to: temporary candidate
+    effect: validation capability no longer receives the real workspace as its working directory
+  - from: candidate result
+    to: real workspace
+    effect: only a checked patch and stabilized event cross the boundary
+  - from: controller lock
+    to: journal and runtime files
+    effect: one process owns cycle selection and runtime mutation at a time
+possibilities:
+  opened:
+    - supervised autonomous validation with measurable repository side effects
+    - future container-backed hostile-check execution
+  restricted:
+    - shell-interpreted checks
+    - in-place proposal checks
+    - silent rollback failure
+    - concurrent controller ownership
+  deferred:
+    - cryptographically authenticated authority
+    - hash-chained journal records
+    - content-addressed discourse references
+    - richer autonomous output attestations
+    - operating-system or container isolation for external side effects
+variants:
+  - id: retain-in-place-checks
+    status: rejected
+    reason: Patch scope validation cannot constrain later check mutations.
+  - id: temporary-git-worktree
+    status: rejected
+    reason: Shared Git administration and dirty-worktree semantics add coupling unnecessary for candidate validation.
+  - id: disposable-project-copy
+    status: selected
+    reason: It separates candidate writes from the real workspace and supports deterministic snapshot comparison.
+collective_findings:
+  - role: external-security-reviewer
+    finding: Shell checks, incomplete rollback, and missing concurrency control block unattended release.
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0029-isolate-autonomous-validation.yaml
+validation:
+  - check: python -m unittest discover -s tests -q
+    result: passed 82 tests
+  - check: isolated apply-check-promote integration test
+    result: passed without Git whitespace warnings
+  - check: adversarial forbidden-write, allowed-output, rollback-failure, and lock tests
+    result: passed
+  - check: python scripts/validate_project.py . and examples/minimal-project
+    result: passed
+  - check: project event validators and git diff --check
+    result: passed
+recovery:
+  strategy: Restore string checks and in-place evaluation only under supervised operation; remove isolation, lock, and structured-check changes together.
+status: stabilized

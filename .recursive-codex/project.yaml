@@ -1,4 +1,4 @@
-schema_version: 1
+schema_version: 2
 project: RecursiveCodex
 domain: autopoiesis
 authority:
@@ -8,7 +8,30 @@ paths:
   decisions: .recursive-codex/decisions
   protected:
     - docs/GENEALOGY.md
+    - .recursive-codex/domain.yaml
+    - scripts/run_autonomous.py
+    - scripts/validate_project.py
+    - schemas/project.schema.json
 checks:
-  - python -m unittest discover -s tests -v
-  - python scripts/validate_project.py .
-  - python scripts/validate_change_event.py templates/change-event.yaml
+  - id: unit-tests
+    command:
+      - python
+      - -m
+      - unittest
+      - discover
+      - -s
+      - tests
+      - -v
+    allowed_outputs: []
+  - id: project-validator
+    command:
+      - python
+      - scripts/validate_project.py
+      - .
+    allowed_outputs: []
+  - id: event-template-validator
+    command:
+      - python
+      - scripts/validate_change_event.py
+      - templates/change-event.yaml
+    allowed_outputs: []

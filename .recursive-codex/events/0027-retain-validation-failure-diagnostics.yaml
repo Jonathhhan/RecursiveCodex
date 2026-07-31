@@ -1,0 +1,84 @@
+schema_version: 1
+id: retain-validation-failure-diagnostics
+operation: revision
+goal: Retain actionable diagnostics when a declared validation check fails or times out without weakening rollback or resource bounds.
+baseline: stabilized event .recursive-codex/events/0026-discourse-revocation-semantics.yaml
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - .recursive-codex/decisions/0027-retain-validation-failure-diagnostics.yaml
+    - .recursive-codex/events/0027-retain-validation-failure-diagnostics.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - .recursive-codex/runtime/generative-kernel.jsonl
+    - .recursive-codex/events/0010-parent-stabilization.yaml
+    - .recursive-codex/events/0018-preserve-preflight-errors.yaml
+    - .recursive-codex/events/0022-integrate-generative-kernel.yaml
+    - .recursive-codex/events/0026-discourse-revocation-semantics.yaml
+    - scripts/run_autonomous.py
+    - tests/test_autonomous.py
+    - docs/ARCHITECTURE.md
+  decisions:
+    - .recursive-codex/decisions/0010-parent-stabilization.yaml
+    - .recursive-codex/decisions/0018-preserve-preflight-errors.yaml
+    - .recursive-codex/decisions/0022-integrate-generative-kernel.yaml
+    - .recursive-codex/decisions/0027-retain-validation-failure-diagnostics.yaml
+changes:
+  - component: declared check execution
+    effect: captures labeled stdout and stderr for failed and timed-out checks
+  - component: proposal failure feedback
+    effect: includes captured diagnostics in the rollback error returned to the autonomous controller
+  - component: generative failure memory
+    effect: persists actionable validation evidence through the existing failed-attempt journal record
+  - component: resource control
+    effect: bounds retained diagnostics and favors the most recent process output when truncation is required
+  - component: regression tests
+    effect: covers failed output, partial timeout output, subprocess capture configuration, and truncation
+relations:
+  - from: declared check process
+    to: proposal rollback
+    effect: validation evidence accompanies the failure while repository changes are still reversed
+  - from: proposal rollback error
+    to: generative journal
+    effect: later strategic selection can distinguish validation causes instead of observing only a generic check status
+  - from: diagnostic capture
+    to: runtime resource invariant
+    effect: persistent failure evidence remains bounded even when a check emits excessive output
+possibilities:
+  opened:
+    - correction strategies informed by assertion messages and tracebacks
+    - diagnosis of partial output from timed-out checks
+  restricted:
+    - repeated proposals caused by generic declared-check failure records
+    - unbounded validation output in persistent strategic memory
+  deferred:
+    - structured per-check diagnostic fields in the generative journal schema
+    - configurable diagnostic retention bounds
+variants:
+  - id: generic-check-status
+    status: rejected
+    reason: It reproduces the observed loss of validation evidence after rollback.
+  - id: unbounded-check-output
+    status: rejected
+    reason: It weakens the controller resource invariant and can expand the append-only journal without limit.
+  - id: bounded-labeled-diagnostics
+    status: selected
+    reason: It preserves actionable evidence within the existing rollback and failure-memory boundaries while bounding retained output.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0027-retain-validation-failure-diagnostics.yaml
+validation:
+  - check: parent controller executed all declared project checks
+    result: passed
+  - check: parent controller validated project and all change events
+    result: passed
+recovery:
+  strategy: Revert diagnostic capture and its tests, then remove this decision and event; generic declared-check failures and existing rollback behavior remain available.
+status: stabilized

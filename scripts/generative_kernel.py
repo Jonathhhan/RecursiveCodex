@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -15,34 +17,123 @@ LEVELS = {"strategic": 3, "tactical": 2, "operational": 1}
 ATTEMPT_STATUSES = {"failed", "succeeded"}
 CAPABILITY_STATUSES = {"available", "missing"}
 CLAIM_KINDS = {"technical", "normative"}
+GENESIS_HASH = "0" * 64
+RESERVED_EVENT_FIELDS = {"schema_version", "sequence", "previous_hash", "event_hash", "kind", "time"}
+
+
+def _canonical_event(event: dict) -> bytes:
+    payload = {key: value for key, value in event.items() if key != "event_hash"}
+    return json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+
+
+def event_hash(event: dict) -> str:
+    return hashlib.sha256(_canonical_event(event)).hexdigest()
+
+
+class JournalLock:
+    def __init__(self, path: Path):
+        self.path = path.with_suffix(path.suffix + ".lock")
+        self.descriptor: int | None = None
+
+    def __enter__(self):
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.descriptor = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        os.write(self.descriptor, str(os.getpid()).encode("ascii"))
+        os.fsync(self.descriptor)
+        return self
+
+    def __exit__(self, exc_type, exc, traceback):
+        if self.descriptor is not None:
+            os.close(self.descriptor)
+        self.path.unlink(missing_ok=True)
 
 
 def read_journal(path: Path) -> list[dict]:
     if not path.exists():
         return []
     events = []
+    previous_hash = GENESIS_HASH
+    previous_time = None
     for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         try:
             event = json.loads(line)
         except json.JSONDecodeError as exc:
             raise ValueError(f"invalid journal line {number}: {exc}") from exc
-        if not isinstance(event, dict) or event.get("schema_version") != 1:
+        if not isinstance(event, dict) or event.get("schema_version") != 2:
             raise ValueError(f"invalid journal event at line {number}")
+        if event.get("sequence") != number:
+            raise ValueError(f"invalid journal sequence at line {number}")
+        if event.get("previous_hash") != previous_hash:
+            raise ValueError(f"broken journal hash chain at line {number}")
+        if event.get("event_hash") != event_hash(event):
+            raise ValueError(f"invalid journal event hash at line {number}")
+        try:
+            event_time = datetime.fromisoformat(event["time"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError(f"invalid journal time at line {number}") from exc
+        if previous_time is not None and event_time < previous_time:
+            raise ValueError(f"journal time moved backwards at line {number}")
         events.append(event)
+        previous_hash = event["event_hash"]
+        previous_time = event_time
     return events
 
 
 def append_event(path: Path, kind: str, payload: dict) -> dict:
-    event = {
-        "schema_version": 1,
-        "kind": kind,
-        "time": datetime.now(timezone.utc).isoformat(),
-        **payload,
-    }
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8", newline="\n") as journal:
-        journal.write(json.dumps(event, ensure_ascii=False, sort_keys=True) + "\n")
+    conflicts = sorted(RESERVED_EVENT_FIELDS.intersection(payload))
+    if conflicts:
+        raise ValueError(f"payload overrides reserved journal fields: {conflicts}")
+    with JournalLock(path):
+        events = read_journal(path)
+        event = {
+            "schema_version": 2,
+            "sequence": len(events) + 1,
+            "previous_hash": events[-1]["event_hash"] if events else GENESIS_HASH,
+            "kind": kind,
+            "time": datetime.now(timezone.utc).isoformat(),
+            **payload,
+        }
+        event["event_hash"] = event_hash(event)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8", newline="\n") as journal:
+            journal.write(json.dumps(event, ensure_ascii=False, sort_keys=True) + "\n")
+            journal.flush()
+            os.fsync(journal.fileno())
     return event
+
+
+def migrate_journal(path: Path) -> int:
+    if not path.exists() or not path.read_text(encoding="utf-8").strip():
+        return 0
+    raw_events: list[dict] = []
+    for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"invalid legacy journal line {number}: {exc}") from exc
+        if not isinstance(event, dict) or event.get("schema_version") != 1:
+            raise ValueError(f"legacy migration requires schema_version 1 at line {number}")
+        raw_events.append(event)
+    previous_hash = GENESIS_HASH
+    migrated = []
+    for sequence, legacy in enumerate(raw_events, 1):
+        event = {**legacy, "schema_version": 2, "sequence": sequence, "previous_hash": previous_hash}
+        event["legacy_event_hash"] = hashlib.sha256(_canonical_event(legacy)).hexdigest()
+        event["event_hash"] = event_hash(event)
+        migrated.append(event)
+        previous_hash = event["event_hash"]
+    temporary = path.with_suffix(path.suffix + ".migrating")
+    with JournalLock(path):
+        with temporary.open("w", encoding="utf-8", newline="\n") as journal:
+            for event in migrated:
+                journal.write(json.dumps(event, ensure_ascii=False, sort_keys=True) + "\n")
+            journal.flush()
+            os.fsync(journal.fileno())
+        os.replace(temporary, path)
+    read_journal(path)
+    return len(migrated)
 
 
 def _validate_normative_goal(event: dict, base_path: Path) -> None:
@@ -158,8 +249,12 @@ def main() -> int:
     attempt.add_argument("--status", choices=ATTEMPT_STATUSES, required=True); attempt.add_argument("--reason", required=True)
     outcome = sub.add_parser("outcome")
     outcome.add_argument("id"); outcome.add_argument("--goal", required=True); outcome.add_argument("--effect", required=True)
-    sub.add_parser("select"); sub.add_parser("status")
+    sub.add_parser("select"); sub.add_parser("status"); sub.add_parser("migrate")
     args = parser.parse_args()
+    if args.command == "migrate":
+        count = migrate_journal(args.journal)
+        print(json.dumps({"status": "migrated", "events": count}, sort_keys=True))
+        return 0
     events = read_journal(args.journal)
     if args.command == "add-goal":
         payload = {

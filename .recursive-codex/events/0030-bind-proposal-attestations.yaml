@@ -1,0 +1,82 @@
+schema_version: 1
+id: bind-proposal-attestations
+operation: revision
+goal: Replace the thin autonomous output envelope with parent-verifiable proposal claims.
+baseline: stabilized event .recursive-codex/events/0029-isolate-autonomous-validation.yaml
+scope:
+  allowed:
+    - schemas/autonomous-result.schema.json
+    - scripts/run_autonomous.py
+    - tests/test_autonomous_attestation.py
+    - tests/test_autonomous_integration.py
+    - docs/AUTONOMOUS_SECURITY.md
+    - .recursive-codex/decisions/0030-bind-proposal-attestations.yaml
+    - .recursive-codex/events/0030-bind-proposal-attestations.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - external security review supplied by the repository owner
+    - .recursive-codex/events/0029-isolate-autonomous-validation.yaml
+    - schemas/autonomous-result.schema.json
+    - scripts/run_autonomous.py
+  decisions:
+    - .recursive-codex/decisions/0030-bind-proposal-attestations.yaml
+changes:
+  - component: autonomous result schema
+    effect: requires structured scope, baseline, risk, recovery, identity, and check claims for proposals
+  - component: parent preflight
+    effect: compares goal, paths, checks, commit, and workspace digest with parent-owned state
+  - component: candidate record gate
+    effect: compares event ID, decision ID, and recovery with parsed records in the isolated candidate
+  - component: critical-risk boundary
+    effect: rejects critical proposals from autonomous admission and requires external authority
+relations:
+  - from: parent baseline
+    to: child proposal
+    effect: proposal validity is tied to the commit and complete workspace content observed before generation
+  - from: patch paths
+    to: declared expected paths
+    effect: omissions and invented scope claims fail closed
+  - from: candidate event and decision
+    to: output envelope
+    effect: record identities and recovery cannot diverge silently from the patch
+possibilities:
+  opened:
+    - audit-ready proposal envelopes
+    - future policy gates keyed by risk
+  restricted:
+    - free-form proposal admission
+    - autonomous critical-risk stabilization
+  deferred:
+    - signed external authority attestations
+    - resulting tree-hash persistence per cycle
+    - structured sensitivity classifications
+variants:
+  - id: descriptive-summary-only
+    status: rejected
+    reason: A summary cannot be deterministically compared with repository state.
+  - id: verified-structured-attestation
+    status: selected
+    reason: Parent-owned values and parsed candidate records provide independent comparison points.
+collective_findings:
+  - role: external-security-reviewer
+    finding: The three-field output schema was too thin for a security-relevant autonomous proposal.
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0030-bind-proposal-attestations.yaml
+validation:
+  - check: python -m unittest discover -s tests -q
+    result: passed 87 tests
+  - check: autonomous result JSON schema parsing
+    result: passed
+  - check: proposal attestation unit and isolated integration tests
+    result: passed
+  - check: project and event validators, dry-run, and git diff --check
+    result: passed
+recovery:
+  strategy: Restore the three-field output envelope and remove attestation gates and tests together.
+status: stabilized

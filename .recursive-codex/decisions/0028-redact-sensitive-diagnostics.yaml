@@ -1,0 +1,24 @@
+id: decision-redact-sensitive-diagnostics
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Redact recognized credentials and inherited sensitive environment values from failed-check diagnostics before applying retention bounds or persisting failure feedback.
+alternatives:
+  - id: retain-raw-diagnostics
+    assessment: Preserves exact process output but can transfer credentials from checks into controller errors and the append-only generative journal.
+  - id: redact-after-truncation
+    assessment: Bounds output first but can retain a secret fragment that no longer matches a recognizable credential pattern.
+  - id: redact-before-retention
+    assessment: Removes recognized sensitive values while their context is intact, then applies the existing deterministic diagnostic bound.
+criteria:
+  - credential confidentiality
+  - actionable failure memory
+  - bounded resource use
+  - deterministic rollback
+  - provenance preservation
+limits:
+  - Pattern-based redaction cannot prove that diagnostics contain no sensitive information.
+  - Redaction preserves labels and structural context but intentionally removes credential values.
+  - Only non-empty inherited values under recognized sensitive environment names are treated as secrets.
+  - The parent controller remains the sole validation and stabilization authority.
+event: .recursive-codex/events/0028-redact-sensitive-diagnostics.yaml

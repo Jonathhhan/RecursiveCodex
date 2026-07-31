@@ -25,6 +25,41 @@ def _safe_project_path(root: Path, value: str) -> Path | None:
     return resolved
 
 
+def _validate_checks(root: Path, value: object, name: str) -> list[str]:
+    if not isinstance(value, list):
+        return [f"{name} must be a list of structured checks"]
+    errors: list[str] = []
+    identifiers: set[str] = set()
+    for index, check in enumerate(value):
+        prefix = f"{name}[{index}]"
+        if not isinstance(check, dict):
+            errors.append(f"{prefix} must be a mapping")
+            continue
+        unknown = set(check) - {"id", "command", "allowed_outputs"}
+        if unknown:
+            errors.append(f"{prefix} has unsupported fields: {sorted(unknown)}")
+        identifier = check.get("id")
+        if not isinstance(identifier, str) or not DOMAIN_PATTERN.fullmatch(identifier):
+            errors.append(f"{prefix}.id must contain lowercase letters, digits, and hyphens")
+        elif identifier in identifiers:
+            errors.append(f"{prefix}.id must be unique")
+        else:
+            identifiers.add(identifier)
+        command = check.get("command")
+        if not isinstance(command, list) or not command or not all(
+            _is_non_empty_string(item) for item in command
+        ):
+            errors.append(f"{prefix}.command must be a non-empty string list")
+        outputs = check.get("allowed_outputs", [])
+        if not isinstance(outputs, list) or not all(_is_non_empty_string(item) for item in outputs):
+            errors.append(f"{prefix}.allowed_outputs must be a string list")
+        else:
+            for output_index, output in enumerate(outputs):
+                if _safe_project_path(root, output) is None:
+                    errors.append(f"{prefix}.allowed_outputs[{output_index}] must stay inside the project")
+    return errors
+
+
 def validate(root: Path) -> list[str]:
     root = root.resolve()
     contract_path = root / ".recursive-codex" / "project.yaml"
@@ -43,8 +78,8 @@ def validate(root: Path) -> list[str]:
         if key not in data:
             errors.append(f"missing field: {key}")
 
-    if data.get("schema_version") != 1:
-        errors.append("schema_version must be 1")
+    if data.get("schema_version") != 2:
+        errors.append("schema_version must be 2")
     if not _is_non_empty_string(data.get("project")):
         errors.append("project must be a non-empty string")
 
@@ -72,11 +107,7 @@ def validate(root: Path) -> list[str]:
                 domain_authority.get("default")
             ):
                 errors.append("domain profile authority.default must be set")
-            domain_checks = domain_profile.get("checks")
-            if not isinstance(domain_checks, list) or not all(
-                _is_non_empty_string(item) for item in domain_checks
-            ):
-                errors.append("domain profile checks must be a list of non-empty strings")
+            errors.extend(_validate_checks(root, domain_profile.get("checks"), "domain profile checks"))
 
     authority = data.get("authority")
     if not isinstance(authority, dict):
@@ -108,9 +139,7 @@ def validate(root: Path) -> list[str]:
             if _safe_project_path(root, value) is None:
                 errors.append(f"paths.protected[{index}] must stay inside the project")
 
-    checks = data.get("checks")
-    if not isinstance(checks, list) or not all(_is_non_empty_string(item) for item in checks):
-        errors.append("checks must be a list of non-empty strings")
+    errors.extend(_validate_checks(root, data.get("checks"), "checks"))
 
     return errors
 
