@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import ctypes
 import hashlib
 import json
 import os
@@ -294,7 +295,7 @@ class RollbackFailure(RuntimeError):
     pass
 
 
-def _excluded_snapshot_path(relative: Path, allowed_outputs: list[str]) -> bool:
+def _excluded_snapshot_path(relative: Path, ephemeral_outputs: list[str]) -> bool:
     parts = relative.parts
     if not parts:
         return False
@@ -303,15 +304,15 @@ def _excluded_snapshot_path(relative: Path, allowed_outputs: list[str]) -> bool:
     if len(parts) >= 2 and parts[0] == ".recursive-codex" and parts[1] == "runtime":
         return True
     value = relative.as_posix()
-    return any(value == item or value.startswith(f"{item}/") for item in allowed_outputs)
+    return any(value == item or value.startswith(f"{item}/") for item in ephemeral_outputs)
 
 
-def snapshot_tree(root: Path, allowed_outputs: list[str] | None = None) -> dict[str, str]:
-    allowed_outputs = [Path(item).as_posix() for item in (allowed_outputs or [])]
+def snapshot_tree(root: Path, ephemeral_outputs: list[str] | None = None) -> dict[str, str]:
+    ephemeral_outputs = [Path(item).as_posix() for item in (ephemeral_outputs or [])]
     snapshot: dict[str, str] = {}
     for path in sorted(root.rglob("*")):
         relative = path.relative_to(root)
-        if _excluded_snapshot_path(relative, allowed_outputs):
+        if _excluded_snapshot_path(relative, ephemeral_outputs):
             continue
         if path.is_symlink():
             snapshot[relative.as_posix()] = f"symlink:{os.readlink(path)}"
@@ -335,6 +336,32 @@ def baseline_commit(root: Path) -> str:
     return completed.stdout.strip()
 
 
+_RISK_ORDER = {"low": 0, "medium": 1, "high": 2, "critical": 3}
+_CRITICAL_PATHS = {
+    ".recursive-codex/project.yaml", ".recursive-codex/domain.yaml",
+    "scripts/run_autonomous.py", "scripts/generative_kernel.py",
+}
+
+
+def minimum_proposal_risk(paths: list[str], patch: str) -> str:
+    normalized = {Path(path).as_posix() for path in paths}
+    if normalized & _CRITICAL_PATHS:
+        return "critical"
+    high = (
+        len(normalized) >= 10
+        or "+++ /dev/null" in patch
+        or "rename from " in patch
+        or any(
+            path.startswith(".github/")
+            or path.startswith("scripts/validate")
+            or path.startswith("schemas/")
+            or path == "docs/AUTONOMOUS_SECURITY.md"
+            for path in normalized
+        )
+    )
+    return "high" if high else "low"
+
+
 def proposal_attestation_errors(
     result: dict,
     selected_goal: str | None,
@@ -355,9 +382,13 @@ def proposal_attestation_errors(
         errors.append("proposal baseline_commit does not match parent baseline")
     if result.get("workspace_digest") != expected_digest:
         errors.append("proposal workspace_digest does not match parent baseline")
-    if result.get("risk") not in {"low", "medium", "high", "critical"}:
+    declared_risk = result.get("risk")
+    minimum_risk = minimum_proposal_risk(paths, result.get("patch", ""))
+    if declared_risk not in _RISK_ORDER:
         errors.append("proposal risk is invalid")
-    elif result.get("risk") == "critical":
+    elif _RISK_ORDER[declared_risk] < _RISK_ORDER[minimum_risk]:
+        errors.append(f"proposal risk must be at least {minimum_risk}")
+    if minimum_risk == "critical" or declared_risk == "critical":
         errors.append("critical proposals require external authority")
     for field in ("recovery", "decision_id", "event_id"):
         if not isinstance(result.get(field), str) or not result[field].strip():
@@ -422,10 +453,10 @@ def declared_check_error(
 
 
 def isolated_check_error(declared_check: dict, root: Path, timeout: float) -> str | None:
-    allowed_outputs = declared_check.get("allowed_outputs", [])
-    before = snapshot_tree(root, allowed_outputs)
+    ephemeral_outputs = declared_check.get("ephemeral_outputs", [])
+    before = snapshot_tree(root, ephemeral_outputs)
     check_error = declared_check_error(declared_check, root, timeout)
-    after = snapshot_tree(root, allowed_outputs)
+    after = snapshot_tree(root, ephemeral_outputs)
     changes = snapshot_changes(before, after)
     if changes:
         detail = ", ".join(changes[:20])
@@ -611,17 +642,24 @@ def apply_proposal(
             if attestation_errors:
                 return attestation_errors
 
+        stabilized_event = (candidate / event_paths[0]).read_bytes()
+        stabilized_decision = (candidate / decision_paths[0]).read_bytes()
         for declared_check in checks:
             check_error = isolated_check_error(declared_check, candidate, timeout)
             if check_error is not None:
                 return [check_error]
+            check_id = declared_check["id"]
+            if (candidate / event_paths[0]).read_bytes() != stabilized_event:
+                return [f"proposal event changed during declared check: {check_id}"]
+            if (candidate / decision_paths[0]).read_bytes() != stabilized_decision:
+                return [f"proposal decision changed during declared check: {check_id}"]
 
         concurrent_changes = snapshot_changes(baseline, snapshot_tree(root))
         if concurrent_changes:
             detail = ", ".join(concurrent_changes[:20])
             return [f"real workspace changed during isolated validation: {detail}"]
 
-        stabilized_text = (candidate / event_paths[0]).read_text(encoding="utf-8")
+        stabilized_text = stabilized_event.decode("utf-8")
 
     runtime.mkdir(parents=True, exist_ok=True)
     patch_file = runtime / "proposal.patch"
@@ -685,6 +723,46 @@ def execute_child(
         return None
 
 
+def process_identity(pid: int) -> str | None:
+    if pid <= 0:
+        return None
+    if os.name == "nt":
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.OpenProcess.argtypes = [ctypes.c_uint32, ctypes.c_int, ctypes.c_uint32]
+        kernel32.OpenProcess.restype = ctypes.c_void_p
+        kernel32.GetProcessTimes.argtypes = [
+            ctypes.c_void_p,
+            ctypes.POINTER(ctypes.c_ulonglong), ctypes.POINTER(ctypes.c_ulonglong),
+            ctypes.POINTER(ctypes.c_ulonglong), ctypes.POINTER(ctypes.c_ulonglong),
+        ]
+        kernel32.GetProcessTimes.restype = ctypes.c_int
+        kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
+        handle = kernel32.OpenProcess(0x1000, False, pid)
+        if not handle:
+            return None
+        try:
+            creation = ctypes.c_ulonglong()
+            exit_time = ctypes.c_ulonglong()
+            kernel = ctypes.c_ulonglong()
+            user = ctypes.c_ulonglong()
+            if not kernel32.GetProcessTimes(
+                handle,
+                ctypes.byref(creation), ctypes.byref(exit_time),
+                ctypes.byref(kernel), ctypes.byref(user),
+            ):
+                return None
+            return f"windows-filetime:{creation.value}"
+        finally:
+            kernel32.CloseHandle(handle)
+    try:
+        stat = Path(f"/proc/{pid}/stat").read_text(encoding="ascii")
+        closing = stat.rfind(")")
+        fields = stat[closing + 2:].split()
+        return f"proc-start-ticks:{fields[19]}"
+    except (OSError, IndexError):
+        return None
+
+
 class WorkspaceLock:
     def __init__(self, path: Path):
         self.path = path
@@ -696,6 +774,7 @@ class WorkspaceLock:
         payload = json.dumps({
             "pid": os.getpid(),
             "started_at": datetime.now(timezone.utc).isoformat(),
+            "process_identity": process_identity(os.getpid()),
         }).encode("utf-8")
         os.write(self.descriptor, payload)
         os.fsync(self.descriptor)
@@ -709,6 +788,34 @@ class WorkspaceLock:
             self.path.unlink()
         except FileNotFoundError:
             pass
+
+
+def unlock_stale_lock(path: Path, minimum_age: float, now: datetime | None = None) -> None:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        pid = payload["pid"]
+        started_at = datetime.fromisoformat(payload["started_at"])
+        recorded_identity = payload["process_identity"]
+    except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise ValueError(f"cannot verify stale lock: {exc}") from exc
+    if not isinstance(pid, int) or not isinstance(recorded_identity, str):
+        raise ValueError("cannot verify stale lock owner identity")
+    if started_at.tzinfo is None:
+        raise ValueError("cannot verify stale lock timestamp")
+    current_time = now or datetime.now(timezone.utc)
+    age = (current_time - started_at).total_seconds()
+    if age < minimum_age:
+        raise ValueError(f"lock age {age:.0f}s is below required {minimum_age:.0f}s")
+    current_identity = process_identity(pid)
+    if current_identity == recorded_identity:
+        raise ValueError("lock owner process is still active")
+    if current_identity is not None and current_identity != recorded_identity:
+        # PID reuse is safe only because the recorded process identity differs.
+        pass
+    try:
+        path.unlink()
+    except FileNotFoundError as exc:
+        raise ValueError("lock disappeared during stale-lock verification") from exc
 
 
 def _run_locked(
@@ -890,10 +997,23 @@ def main() -> int:
         default=900,
         help="Maximum seconds for one child operation; 0 disables the timeout",
     )
+    parser.add_argument("--unlock-stale", action="store_true")
+    parser.add_argument("--stale-after", type=float, default=3600)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     if args.max_cycles < 0 or args.interval < 0 or args.cycle_timeout < 0:
         parser.error("cycle and interval values must be non-negative")
+    if args.stale_after < 0:
+        parser.error("stale-after must be non-negative")
+    if args.unlock_stale:
+        lock_path = Path(args.project_root).resolve() / ".recursive-codex" / "runtime" / "controller.lock"
+        try:
+            unlock_stale_lock(lock_path, args.stale_after)
+        except ValueError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 73
+        print(f"UNLOCKED STALE CONTROLLER LOCK {lock_path}")
+        return 0
     return run(
         Path(args.project_root),
         args.codex,

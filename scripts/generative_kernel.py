@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -136,6 +137,10 @@ def migrate_journal(path: Path) -> int:
     return len(migrated)
 
 
+def discourse_content_hash(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def _validate_normative_goal(event: dict, base_path: Path) -> None:
     reference = event.get("discourse_event")
     if not isinstance(reference, str) or not reference.strip():
@@ -143,6 +148,11 @@ def _validate_normative_goal(event: dict, base_path: Path) -> None:
     path = Path(reference)
     if not path.is_absolute():
         path = base_path / path
+    expected_hash = event.get("discourse_hash")
+    if not isinstance(expected_hash, str) or not re.fullmatch(r"[0-9a-f]{64}", expected_hash):
+        raise ValueError("normative goal requires a discourse_hash")
+    if discourse_content_hash(path) != expected_hash:
+        raise ValueError("normative goal discourse content hash mismatch")
     errors = validate_discourse(path)
     if errors:
         raise ValueError(f"normative goal discourse gate failed: {'; '.join(errors)}")
@@ -188,7 +198,11 @@ def replay(events: list[dict], base_path: Path | None = None) -> dict:
                 "requires": event.get("requires", []), "status": "pending",
             }
             if claim_kind == "normative":
-                goal_state.update(claim_kind=claim_kind, discourse_event=event["discourse_event"])
+                goal_state.update(
+                    claim_kind=claim_kind,
+                    discourse_event=event["discourse_event"],
+                    discourse_hash=event["discourse_hash"],
+                )
             state["goals"][goal_id] = goal_state
         elif kind == "capability-recorded":
             if event.get("status") not in CAPABILITY_STATUSES:
@@ -266,6 +280,10 @@ def main() -> int:
         }
         if args.discourse_event:
             payload["discourse_event"] = args.discourse_event
+            discourse_path = Path(args.discourse_event)
+            if not discourse_path.is_absolute():
+                discourse_path = Path.cwd() / discourse_path
+            payload["discourse_hash"] = discourse_content_hash(discourse_path)
         replay([*events, {"schema_version": 1, "kind": "goal-added", **payload}])
         append_event(args.journal, "goal-added", payload)
     elif args.command == "capability":

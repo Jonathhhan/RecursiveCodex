@@ -64,13 +64,15 @@ class GenerativeKernelTests(unittest.TestCase):
             kernel.replay([event])
 
     def test_stabilized_discourse_admits_normative_goal(self):
+        path = ROOT / "examples" / "communicative-event.yaml"
         event = self.event(
             "goal-added", id="norm", level="strategic", priority=1,
             requires=[], claim_kind="normative",
-            discourse_event=str(ROOT / "examples" / "communicative-event.yaml"),
+            discourse_event=str(path), discourse_hash=kernel.discourse_content_hash(path),
         )
         state = kernel.replay([event])
         self.assertEqual(state["goals"]["norm"]["claim_kind"], "normative")
+        self.assertEqual(state["goals"]["norm"]["discourse_hash"], event["discourse_hash"])
 
     def test_proposed_discourse_cannot_admit_normative_goal(self):
         source = (ROOT / "examples" / "communicative-event.yaml").read_text(encoding="utf-8")
@@ -80,6 +82,7 @@ class GenerativeKernelTests(unittest.TestCase):
             event = self.event(
                 "goal-added", id="norm", level="strategic", priority=1,
                 requires=[], claim_kind="normative", discourse_event=str(path),
+                discourse_hash=kernel.discourse_content_hash(path),
             )
             with self.assertRaisesRegex(ValueError, "requires a stabilized discourse event"):
                 kernel.replay([event])
@@ -101,8 +104,23 @@ class GenerativeKernelTests(unittest.TestCase):
             event = self.event(
                 "goal-added", id="norm", level="strategic", priority=1,
                 requires=[], claim_kind="normative", discourse_event=str(path),
+                discourse_hash=kernel.discourse_content_hash(path),
             )
             with self.assertRaisesRegex(ValueError, "has been revoked"):
+                kernel.replay([event])
+
+    def test_modified_discourse_is_rejected_by_bound_hash(self):
+        source = ROOT / "examples" / "communicative-event.yaml"
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "discourse.yaml"
+            path.write_bytes(source.read_bytes())
+            event = self.event(
+                "goal-added", id="norm", level="strategic", priority=1,
+                requires=[], claim_kind="normative", discourse_event=str(path),
+                discourse_hash=kernel.discourse_content_hash(path),
+            )
+            path.write_text(path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "content hash mismatch"):
                 kernel.replay([event])
 
     def test_technical_goal_preserves_existing_state_shape(self):

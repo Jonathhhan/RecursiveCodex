@@ -23,7 +23,7 @@ checks:
       - python
       - scripts/validate_discourse.py
       - <event-file>
-    allowed_outputs: []
+    ephemeral_outputs: []
 limits:
   - Validator success does not prove genuine consent or absence of coercion.
   - Technical authority cannot silently resolve a normative objection.

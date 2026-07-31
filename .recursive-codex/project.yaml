@@ -1,4 +1,4 @@
-schema_version: 2
+schema_version: 3
 project: RecursiveCodex
 domain: autopoiesis
 authority:
@@ -22,16 +22,16 @@ checks:
       - -s
       - tests
       - -v
-    allowed_outputs: []
+    ephemeral_outputs: []
   - id: project-validator
     command:
       - python
       - scripts/validate_project.py
       - .
-    allowed_outputs: []
+    ephemeral_outputs: []
   - id: event-template-validator
     command:
       - python
       - scripts/validate_change_event.py
       - templates/change-event.yaml
-    allowed_outputs: []
+    ephemeral_outputs: []

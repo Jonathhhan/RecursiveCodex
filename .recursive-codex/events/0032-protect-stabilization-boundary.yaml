@@ -1,0 +1,79 @@
+schema_version: 1
+id: protect-stabilization-boundary
+operation: revision
+goal: Close the remaining validation-output path and risk-attestation gaps at the autonomous promotion boundary.
+baseline: stabilized event .recursive-codex/events/0031-hash-chain-generative-journal.yaml
+scope:
+  allowed:
+    - .recursive-codex/project.yaml
+    - domains/communicative-action.yaml
+    - schemas/project.schema.json
+    - templates/project.yaml
+    - examples/minimal-project/.recursive-codex/project.yaml
+    - scripts/validate_project.py
+    - scripts/run_autonomous.py
+    - tests/test_autonomous_security.py
+    - tests/test_autonomous_attestation.py
+    - tests/test_autonomous_integration.py
+    - docs/AUTONOMOUS_SECURITY.md
+    - .recursive-codex/decisions/0032-protect-stabilization-boundary.yaml
+    - .recursive-codex/events/0032-protect-stabilization-boundary.yaml
+  protected:
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - .recursive-codex/events/0029-isolate-autonomous-validation.yaml
+    - .recursive-codex/events/0030-bind-proposal-attestations.yaml
+    - .recursive-codex/events/0031-hash-chain-generative-journal.yaml
+    - docs/ARCHITECTURE.md
+    - docs/AUTONOMOUS_SECURITY.md
+    - external security review supplied by repository owner on 2026-07-31
+  decisions:
+    - .recursive-codex/decisions/0032-protect-stabilization-boundary.yaml
+changes:
+  - component: validation output contract
+    effect: renames allowed outputs to discarded ephemeral outputs and rejects overlap with authority, provenance, controller, validator, schema, and protected paths
+  - component: promotion boundary
+    effect: captures stabilized event and decision bytes before checks and verifies byte identity after every check
+  - component: risk admission
+    effect: derives minimum critical or high risk from actual paths, deletions, renames, and large changes
+relations:
+  - from: declared validation check
+    to: stabilized records
+    effect: mutation is detected even when snapshot exclusions are misconfigured
+  - from: proposal patch
+    to: risk admission
+    effect: the parent no longer trusts only the child-declared risk
+possibilities:
+  opened:
+    - safe explicit stale-lock recovery
+    - content-addressed discourse provenance
+    - mocked external-side-effect boundaries
+  restricted:
+    - promotion of check-mutated event or decision records
+    - ephemeral output overlap with repository trust anchors
+    - autonomous underclassification of critical controller changes
+  deferred:
+    - operating-system isolation for network and process side effects
+variants:
+  - id: snapshot-only
+    status: rejected
+    reason: Snapshot exclusions remain configuration-sensitive.
+  - id: byte-invariant-plus-contract
+    status: selected
+    reason: Defense in depth protects both configuration and promoted bytes.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0032-protect-stabilization-boundary.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 97 tests
+  - check: project contract validators
+    result: passed repository and minimal example
+  - check: change-event validator and git diff --check
+    result: passed
+recovery:
+  strategy: Revert schema version 3, ephemeral-output validation, record byte invariants, derived risk logic, tests, decision, and this event.
+status: stabilized

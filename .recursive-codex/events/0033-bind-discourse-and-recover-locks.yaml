@@ -1,0 +1,71 @@
+schema_version: 1
+id: bind-discourse-and-recover-locks
+operation: revision
+goal: Make normative replay content-stable and make abandoned controller locks safely recoverable by an explicit operator.
+baseline: stabilized event .recursive-codex/events/0032-protect-stabilization-boundary.yaml
+scope:
+  allowed:
+    - scripts/generative_kernel.py
+    - scripts/run_autonomous.py
+    - tests/test_generative_kernel.py
+    - tests/test_autonomous_security.py
+    - docs/GENERATIVE_KERNEL.md
+    - docs/AUTONOMOUS_SECURITY.md
+    - .recursive-codex/decisions/0033-bind-discourse-and-recover-locks.yaml
+    - .recursive-codex/events/0033-bind-discourse-and-recover-locks.yaml
+  protected:
+    - .recursive-codex/project.yaml
+    - .recursive-codex/domain.yaml
+    - docs/GENEALOGY.md
+provenance:
+  sources:
+    - .recursive-codex/events/0025-discourse-gated-normative-goals.yaml
+    - .recursive-codex/events/0026-discourse-revocation-semantics.yaml
+    - .recursive-codex/events/0029-isolate-autonomous-validation.yaml
+    - .recursive-codex/events/0032-protect-stabilization-boundary.yaml
+    - external security review supplied by repository owner on 2026-07-31
+  decisions:
+    - .recursive-codex/decisions/0033-bind-discourse-and-recover-locks.yaml
+changes:
+  - component: normative goal admission
+    effect: records the SHA-256 hash of referenced discourse bytes and verifies it on every replay
+  - component: controller lock
+    effect: records an operating-system process identity in addition to PID and time
+  - component: stale-lock recovery
+    effect: adds an explicit unlock command requiring minimum age and proof that the recorded process identity is inactive
+relations:
+  - from: journaled normative goal
+    to: discourse evidence
+    effect: replay is bound to the originally admitted bytes
+  - from: operator unlock request
+    to: controller lock
+    effect: deletion occurs only after conservative identity and age checks
+possibilities:
+  opened:
+    - external anchoring of discourse and journal head hashes
+    - containerized execution of declared checks
+  restricted:
+    - silent normative replay drift
+    - automatic age-only lock stealing
+  deferred:
+    - cryptographic author signatures
+    - built-in network namespace isolation
+variants:
+  - id: fail-closed-content-and-lock-binding
+    status: selected
+    reason: It preserves deterministic evidence and live-process ownership.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0033-bind-discourse-and-recover-locks.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 102 tests
+  - check: process identity, active lock, young lock, dead owner, and modified discourse tests
+    result: passed
+  - check: project and change-event validators plus git diff --check
+    result: passed
+recovery:
+  strategy: Revert discourse hashes, process identities, stale unlock command, tests, documentation, decision, and this event.
+status: stabilized

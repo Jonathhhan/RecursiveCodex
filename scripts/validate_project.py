@@ -25,7 +25,24 @@ def _safe_project_path(root: Path, value: str) -> Path | None:
     return resolved
 
 
-def _validate_checks(root: Path, value: object, name: str) -> list[str]:
+TRUST_ANCHORS = {
+    ".recursive-codex/project.yaml", ".recursive-codex/domain.yaml",
+    ".recursive-codex/events", ".recursive-codex/decisions",
+    "scripts/run_autonomous.py", "scripts/validate_project.py",
+    "scripts/validate_change_event.py", "scripts/generative_kernel.py",
+    "scripts/validate_discourse.py", "schemas",
+}
+
+
+def _paths_overlap(left: str, right: str) -> bool:
+    left = Path(left).as_posix().rstrip("/")
+    right = Path(right).as_posix().rstrip("/")
+    return left == right or left.startswith(f"{right}/") or right.startswith(f"{left}/")
+
+
+def _validate_checks(
+    root: Path, value: object, name: str, protected: list[str] | None = None
+) -> list[str]:
     if not isinstance(value, list):
         return [f"{name} must be a list of structured checks"]
     errors: list[str] = []
@@ -35,7 +52,7 @@ def _validate_checks(root: Path, value: object, name: str) -> list[str]:
         if not isinstance(check, dict):
             errors.append(f"{prefix} must be a mapping")
             continue
-        unknown = set(check) - {"id", "command", "allowed_outputs"}
+        unknown = set(check) - {"id", "command", "ephemeral_outputs"}
         if unknown:
             errors.append(f"{prefix} has unsupported fields: {sorted(unknown)}")
         identifier = check.get("id")
@@ -50,13 +67,16 @@ def _validate_checks(root: Path, value: object, name: str) -> list[str]:
             _is_non_empty_string(item) for item in command
         ):
             errors.append(f"{prefix}.command must be a non-empty string list")
-        outputs = check.get("allowed_outputs", [])
+        outputs = check.get("ephemeral_outputs", [])
         if not isinstance(outputs, list) or not all(_is_non_empty_string(item) for item in outputs):
-            errors.append(f"{prefix}.allowed_outputs must be a string list")
+            errors.append(f"{prefix}.ephemeral_outputs must be a string list")
         else:
+            forbidden = TRUST_ANCHORS | {Path(item).as_posix() for item in (protected or [])}
             for output_index, output in enumerate(outputs):
                 if _safe_project_path(root, output) is None:
-                    errors.append(f"{prefix}.allowed_outputs[{output_index}] must stay inside the project")
+                    errors.append(f"{prefix}.ephemeral_outputs[{output_index}] must stay inside the project")
+                elif any(_paths_overlap(output, anchor) for anchor in forbidden):
+                    errors.append(f"{prefix}.ephemeral_outputs[{output_index}] overlaps protected state")
     return errors
 
 
@@ -78,8 +98,8 @@ def validate(root: Path) -> list[str]:
         if key not in data:
             errors.append(f"missing field: {key}")
 
-    if data.get("schema_version") != 2:
-        errors.append("schema_version must be 2")
+    if data.get("schema_version") != 3:
+        errors.append("schema_version must be 3")
     if not _is_non_empty_string(data.get("project")):
         errors.append("project must be a non-empty string")
 
@@ -139,7 +159,7 @@ def validate(root: Path) -> list[str]:
             if _safe_project_path(root, value) is None:
                 errors.append(f"paths.protected[{index}] must stay inside the project")
 
-    errors.extend(_validate_checks(root, data.get("checks"), "checks"))
+    errors.extend(_validate_checks(root, data.get("checks"), "checks", protected if isinstance(protected, list) else []))
 
     return errors
 

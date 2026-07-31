@@ -14,14 +14,14 @@ checks:
       - discover
       - -s
       - tests
-    allowed_outputs: []
+    ephemeral_outputs: []
 ```
 
-The parent copies the project to a temporary candidate directory without `.git`, controller runtime files, bytecode caches, or symbolic links. It applies and stabilizes the proposal there, then runs each check with `shell=False`. A content snapshot is compared before and after every check. Changes outside `allowed_outputs` reject the proposal. The candidate directory is discarded in every case.
+The parent copies the project to a temporary candidate directory without `.git`, controller runtime files, bytecode caches, or symbolic links. It applies and stabilizes the proposal there, then runs each check with `shell=False`. A content snapshot is compared before and after every check. Changes outside `ephemeral_outputs` reject the proposal. Ephemeral outputs are never promoted and may not overlap contracts, events, decisions, controller or validator code, schemas, or protected paths. The candidate directory is discarded in every case.
 
 Only after candidate validation succeeds and the real workspace is confirmed unchanged does the parent apply the patch to the real project. If finalization fails, reverse-patch success and the restored workspace snapshot are mandatory. Failure of either condition raises a hard controller error.
 
-An atomic `.recursive-codex/runtime/controller.lock` contains the PID and UTC start time. A second controller cannot enter the workspace while the lock exists. Stale locks require explicit operator inspection and removal; they are never silently stolen.
+An atomic `.recursive-codex/runtime/controller.lock` contains the PID, UTC start time, and operating-system process identity. A second controller cannot enter the workspace while the lock exists. `run_autonomous.py <project> --unlock-stale --stale-after 3600` is an explicit operator action: it removes the lock only after the minimum age and only when the recorded process identity is no longer active. Malformed, young, or actively owned locks fail closed and are never silently stolen.
 
 ## Proposal attestations
 

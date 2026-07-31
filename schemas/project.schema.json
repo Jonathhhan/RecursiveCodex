@@ -5,7 +5,7 @@
   "type": "object",
   "required": ["schema_version", "project", "domain", "authority", "paths", "checks"],
   "properties": {
-    "schema_version": {"const": 2},
+    "schema_version": {"const": 3},
     "project": {"type": "string", "minLength": 1},
     "domain": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
     "authority": {
@@ -34,7 +34,7 @@
             "minItems": 1,
             "items": {"type": "string", "minLength": 1}
           },
-          "allowed_outputs": {
+          "ephemeral_outputs": {
             "type": "array",
             "items": {"type": "string", "minLength": 1}
           }

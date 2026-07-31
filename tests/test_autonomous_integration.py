@@ -89,7 +89,7 @@ status: proposed
                 [{
                     "id": "read-only-check",
                     "command": [sys.executable, "-c", "print('validated')"],
-                    "allowed_outputs": [],
+                    "ephemeral_outputs": [],
                 }],
                 30,
                 {

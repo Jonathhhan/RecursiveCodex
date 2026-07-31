@@ -73,6 +73,32 @@ class AutonomousAttestationTests(unittest.TestCase):
         )
         self.assertIn("critical proposals require external authority", errors)
 
+    def test_parent_derives_minimum_risk_from_patch(self):
+        cases = (
+            ("scripts/run_autonomous.py", "high", "critical"),
+            ("scripts/validate_project.py", "medium", "high"),
+        )
+        for path, declared, minimum in cases:
+            with self.subTest(path=path):
+                result = self.result()
+                result["patch"] += f"diff --git a/{path} b/{path}\n--- a/{path}\n+++ b/{path}\n"
+                result["expected_paths"] = sorted(controller.patch_paths(result["patch"]))
+                result["risk"] = declared
+                errors = controller.proposal_attestation_errors(
+                    result, "goal", [{"id": "unit-tests"}], "a" * 40, "b" * 64
+                )
+                self.assertIn(f"proposal risk must be at least {minimum}", errors)
+
+    def test_parent_derives_high_risk_from_deletion(self):
+        result = self.result()
+        result["patch"] += "diff --git a/old.txt b/old.txt\n--- a/old.txt\n+++ /dev/null\n"
+        result["expected_paths"] = sorted(controller.patch_paths(result["patch"]))
+        result["risk"] = "medium"
+        errors = controller.proposal_attestation_errors(
+            result, "goal", [{"id": "unit-tests"}], "a" * 40, "b" * 64
+        )
+        self.assertIn("proposal risk must be at least high", errors)
+
     def test_record_ids_and_recovery_are_bound(self):
         result = self.result()
         errors = controller.record_attestation_errors(

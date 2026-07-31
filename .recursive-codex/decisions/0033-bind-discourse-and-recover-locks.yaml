@@ -1,0 +1,21 @@
+id: decision-bind-discourse-and-recover-locks
+date: 2026-07-31
+status: accepted
+authority: recursive-codex-system
+decision: Bind normative goals to discourse content hashes and permit stale controller-lock removal only through an explicit age- and process-identity-verified operator action.
+alternatives:
+  - id: mutable-discourse-reference
+    assessment: Rejected because journal replay could change when referenced bytes change.
+  - id: age-only-lock-removal
+    assessment: Rejected because a long-running live controller could lose its lock.
+  - id: content-hash-and-process-identity
+    assessment: Selected because both operations fail closed against ambiguous state.
+criteria:
+  - deterministic replay
+  - operator control
+  - live-process safety
+  - cross-platform behavior
+limits:
+  - SHA-256 binds bytes, not the social legitimacy of discourse.
+  - External check side effects still require an OS sandbox outside this repository.
+event: .recursive-codex/events/0033-bind-discourse-and-recover-locks.yaml

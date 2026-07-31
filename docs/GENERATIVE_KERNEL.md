@@ -18,7 +18,7 @@ Goals default to technical claims. A goal declared with `--claim-kind normative`
 python scripts/generative_kernel.py memory.jsonl add-goal revise-policy --level strategic --priority 20 --claim-kind normative --discourse-event examples/communicative-event.yaml --requires discourse-validator
 ```
 
-The reference is resolved relative to the process working directory. Initial admission and later journal replay both reapply the gate, so missing, malformed, proposed, contested, revoked, or non-normative discourse evidence is an invariant violation rather than a selectable goal. Existing journal goals remain technical by default and retain their prior replayed state shape.
+The reference is resolved relative to the process working directory. On admission the kernel records its SHA-256 content hash; replay requires the current bytes to match that bound hash before reapplying the discourse gate. Missing, modified, malformed, proposed, contested, revoked, or non-normative evidence is therefore an invariant violation rather than a selectable goal. Existing journal goals remain technical by default and retain their prior replayed state shape.
 
 A revoked discourse record retains its stabilized status and accepted historical closure. Its validated `discourse.revocation` marker records the reason and responsible authority, while the kernel treats that evidence as inadmissible for new and replayed normative goals.
 
