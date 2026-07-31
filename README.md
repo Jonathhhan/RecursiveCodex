@@ -35,6 +35,14 @@ python scripts/validate_project.py C:\path\to\project
 python scripts/validate_change_event.py C:\path\to\project\.recursive-codex\events\0001-example.yaml
 ```
 
+
+## Unified audit
+
+```powershell
+python scripts/recursive_codex.py audit .
+```
+
+The audit checks project and domain contracts, individual records, the event/decision graph, structured baselines, journal hash chains, and workspace state. See `docs/AUDIT.md`.
 Then ask Codex to use `$recursive-codex` for a change, audit, revision, or reorganization.
 
 ## Repository layout

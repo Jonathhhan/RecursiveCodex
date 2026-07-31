@@ -1,0 +1,22 @@
+id: decision-add-unified-project-audit
+date: 2026-08-01
+status: accepted
+authority: recursive-codex-system
+decision: Add a unified audit command that validates project structure, record graphs, structured baselines, journal hash chains, and workspace state in one report.
+alternatives:
+  - id: independent-validator-invocations
+    assessment: Rejected because they do not expose cross-record graph failures or one inspectable result.
+  - id: reject-all-legacy-baselines
+    assessment: Rejected because early history predates path-addressed baseline edges and should remain visible rather than falsified.
+  - id: strict-graph-with-legacy-warnings
+    assessment: Selected because current structured edges fail hard while historical free-form baselines remain explicit warnings.
+criteria:
+  - one audit entry point
+  - duplicate and missing reference detection
+  - baseline cycle detection
+  - journal hash-chain validation
+  - machine-readable report
+limits:
+  - Audit success establishes structural integrity, not domain truth or artistic value.
+  - Legacy baseline labels remain warnings until an explicitly authorized migration records their translations.
+event: .recursive-codex/events/0043-add-unified-project-audit.yaml

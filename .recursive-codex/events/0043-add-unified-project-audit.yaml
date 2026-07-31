@@ -1,0 +1,74 @@
+schema_version: 1
+id: add-unified-project-audit
+operation: reorganization
+goal: Provide one deterministic audit of contracts, execution records, graph relations, journals, and workspace state.
+baseline: stabilized event .recursive-codex/events/0042-close-domain-review-findings.yaml
+scope:
+  allowed:
+    - scripts/audit_project.py
+    - scripts/recursive_codex.py
+    - docs/AUDIT.md
+    - README.md
+    - tests/test_audit_project.py
+    - .recursive-codex/decisions/0043-add-unified-project-audit.yaml
+    - .recursive-codex/events/0043-add-unified-project-audit.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - scripts/run_autonomous.py
+    - scripts/validate_project.py
+provenance:
+  sources:
+    - user request to implement the remaining architecture phases
+    - repository review of commit 14f5d16
+    - .recursive-codex/events/0042-close-domain-review-findings.yaml
+  decisions:
+    - .recursive-codex/decisions/0043-add-unified-project-audit.yaml
+changes:
+  - component: unified CLI
+    effect: adds an audit subcommand with text and JSON output
+  - component: record graph
+    effect: checks unique IDs, event-decision references, structured baselines, and cycles
+  - component: journals
+    effect: replays available generative and autopoietic journals through hash-chain validation
+  - component: workspace
+    effect: reports clean, dirty, or unavailable Git state without conflating dirtiness with graph corruption
+relations:
+  - from: individual validators
+    to: unified audit
+    effect: composes existing structural checks and adds cross-record invariants
+  - from: legacy baseline
+    to: audit report
+    effect: remains visible as an unvalidated warning rather than a fabricated graph edge
+possibilities:
+  opened:
+    - CI publication of complete audit reports
+    - explicit migration of legacy baseline labels
+    - artifact-instance audit after project-schema extension
+  restricted:
+    - duplicate record identities
+    - missing structured baseline targets
+    - cyclic structured event histories
+    - silent journal hash-chain failure
+  deferred:
+    - automatic artifact-instance binding
+    - legacy baseline migration
+    - controller package decomposition
+variants:
+  - id: strict-graph-with-legacy-warnings
+    status: selected
+    reason: It validates all machine-readable relations without rewriting historical meaning.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0043-add-unified-project-audit.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: python scripts/recursive_codex.py audit . --json
+    result: passed 143 tests
+  - check: project, minimal-project, and change-event validators plus git diff --check
+    result: passed with 43 events, 43 decisions, 31 structured baselines, and no hard errors
+recovery:
+  strategy: Remove the audit modules, tests, documentation, and README entry, then remove this decision and event.
+status: stabilized
