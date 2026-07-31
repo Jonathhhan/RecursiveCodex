@@ -93,6 +93,36 @@ class ProjectValidatorTests(unittest.TestCase):
             errors = validate_project.validate(root)
         self.assertIn("paths.events must stay inside the project", errors)
 
+    def test_missing_configured_directory_is_rejected(self):
+        template = (ROOT / "templates" / "project.yaml").read_text(encoding="utf-8")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = root / ".recursive-codex"
+            target.mkdir()
+            (target / "project.yaml").write_text(template, encoding="utf-8")
+            errors = validate_project.validate(root)
+        self.assertIn(
+            "paths.events directory does not exist: .recursive-codex/events",
+            errors,
+        )
+        self.assertIn(
+            "paths.decisions directory does not exist: .recursive-codex/decisions",
+            errors,
+        )
+
+    def test_protected_parent_traversal_is_rejected(self):
+        template = (ROOT / "templates" / "project.yaml").read_text(encoding="utf-8")
+        template = template.replace("protected: []", "protected:\n    - ../secrets")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = root / ".recursive-codex"
+            target.mkdir()
+            (target / "events").mkdir()
+            (target / "decisions").mkdir()
+            (target / "project.yaml").write_text(template, encoding="utf-8")
+            errors = validate_project.validate(root)
+        self.assertIn("paths.protected[0] must stay inside the project", errors)
+
     def test_checks_must_be_strings(self):
         template = (ROOT / "templates" / "project.yaml").read_text(encoding="utf-8")
         template = template.replace("checks: []", "checks:\n  - 42")
