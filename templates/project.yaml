@@ -8,3 +8,4 @@ paths:
   decisions: .recursive-codex/decisions
   protected: []
 checks: []
+artifacts: []

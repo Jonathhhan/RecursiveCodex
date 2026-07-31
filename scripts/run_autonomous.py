@@ -833,7 +833,7 @@ def unlock_stale_lock(path: Path, minimum_age: float, now: datetime | None = Non
 
 
 def effective_declared_checks(root: Path, contract: dict) -> list[dict]:
-    """Return the validated execution order: domain checks, then project checks."""
+    """Return domain, artifact, then project checks in deterministic order."""
     domain_profile = load(root / ".recursive-codex" / "domain.yaml")
     if not isinstance(domain_profile, dict):
         raise ValueError("domain profile must be a mapping")
@@ -841,7 +841,26 @@ def effective_declared_checks(root: Path, contract: dict) -> list[dict]:
     project_checks = contract.get("checks")
     if not isinstance(domain_checks, list) or not isinstance(project_checks, list):
         raise ValueError("domain and project checks must be lists")
-    return [*domain_checks, *project_checks]
+    artifacts = contract.get("artifacts", [])
+    if not isinstance(artifacts, list):
+        raise ValueError("artifacts must be a list")
+    artifact_checks: list[dict] = []
+    if artifacts:
+        artifact_contract = domain_profile.get("artifact_contract")
+        if not isinstance(artifact_contract, dict):
+            raise ValueError("artifacts require domain artifact_contract")
+        validator = artifact_contract.get("validator")
+        kind = artifact_contract.get("kind")
+        if not isinstance(validator, str) or not isinstance(kind, str):
+            raise ValueError("domain artifact contract is invalid")
+        validator_path = Path(__file__).resolve().parents[1] / validator
+        for artifact in artifacts:
+            artifact_checks.append({
+                "id": f"artifact-{artifact['id']}",
+                "command": [sys.executable, str(validator_path), kind, artifact["path"]],
+                "ephemeral_outputs": [],
+            })
+    return [*domain_checks, *artifact_checks, *project_checks]
 
 
 def _run_locked(

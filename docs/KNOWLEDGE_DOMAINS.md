@@ -48,4 +48,12 @@ python scripts/validate_domain_artifact.py philosophy path/to/thesis.json
 ```
 
 
-Projects can bind the relevant invocation into `.recursive-codex/project.yaml`. It then joins the effective check list and runs inside the same isolated candidate workspace as domain and project checks.
+Projects bind artifact instances in `.recursive-codex/project.yaml`:
+
+```yaml
+artifacts:
+  - id: principal-thesis
+    path: artifacts/thesis.json
+```
+
+The active domain supplies the validator and kind. The controller derives an `artifact-principal-thesis` check automatically and executes it between domain checks and project checks in the isolated candidate workspace. Missing files, unsafe paths, absent domain contracts, and effective check-ID collisions fail project validation.

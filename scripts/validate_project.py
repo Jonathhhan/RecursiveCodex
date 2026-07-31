@@ -80,6 +80,64 @@ def _validate_checks(
     return errors
 
 
+def _validate_artifacts(
+    root: Path, value: object, domain_profile: object,
+    domain_checks: list[dict], project_checks: object,
+) -> list[str]:
+    if value is None:
+        return []
+    if not isinstance(value, list):
+        return ["artifacts must be a list"]
+    errors: list[str] = []
+    contract = domain_profile.get("artifact_contract") if isinstance(domain_profile, dict) else None
+    identifiers: set[str] = set()
+    check_ids = {
+        item.get("id") for item in domain_checks if isinstance(item.get("id"), str)
+    }
+    if isinstance(project_checks, list):
+        check_ids.update(
+            item.get("id") for item in project_checks
+            if isinstance(item, dict) and isinstance(item.get("id"), str)
+        )
+    for index, artifact in enumerate(value):
+        prefix = f"artifacts[{index}]"
+        if not isinstance(artifact, dict):
+            errors.append(f"{prefix} must be a mapping")
+            continue
+        unknown = set(artifact) - {"id", "path"}
+        if unknown:
+            errors.append(f"{prefix} has unsupported fields: {sorted(unknown)}")
+        identifier = artifact.get("id")
+        if not isinstance(identifier, str) or not DOMAIN_PATTERN.fullmatch(identifier):
+            errors.append(f"{prefix}.id must contain lowercase letters, digits, and hyphens")
+        elif identifier in identifiers:
+            errors.append(f"{prefix}.id must be unique")
+        else:
+            identifiers.add(identifier)
+            if f"artifact-{identifier}" in check_ids:
+                errors.append(f"{prefix}.id produces a duplicate effective check id")
+        path_value = artifact.get("path")
+        configured = _safe_project_path(root, path_value) if isinstance(path_value, str) else None
+        if not _is_non_empty_string(path_value) or configured is None:
+            errors.append(f"{prefix}.path must stay inside the project")
+        elif not configured.is_file():
+            errors.append(f"{prefix}.path does not exist: {path_value}")
+    if contract is not None and not isinstance(contract, dict):
+        errors.append("domain artifact_contract must be a mapping")
+    elif isinstance(contract, dict):
+        validator = contract.get("validator")
+        kind = contract.get("kind")
+        plugin_root = Path(__file__).resolve().parents[1]
+        validator_path = _safe_project_path(plugin_root, validator) if isinstance(validator, str) else None
+        if validator_path is None or not validator_path.is_file():
+            errors.append("domain artifact_contract.validator must name an installed validator")
+        if not _is_non_empty_string(kind):
+            errors.append("domain artifact_contract.kind must be set")
+    elif value:
+        errors.append("artifacts require domain artifact_contract")
+    return errors
+
+
 def validate(root: Path) -> list[str]:
     root = root.resolve()
     contract_path = root / ".recursive-codex" / "project.yaml"
@@ -169,6 +227,9 @@ def validate(root: Path) -> list[str]:
         ))
 
     project_checks = data.get("checks")
+    errors.extend(_validate_artifacts(
+        root, data.get("artifacts"), domain_profile, domain_checks, project_checks,
+    ))
     if isinstance(project_checks, list):
         domain_ids = {item.get("id") for item in domain_checks if isinstance(item.get("id"), str)}
         for index, check in enumerate(project_checks):

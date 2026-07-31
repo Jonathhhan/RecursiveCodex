@@ -1,0 +1,21 @@
+id: decision-bind-domain-artifacts-automatically
+date: 2026-08-01
+status: accepted
+authority: recursive-codex-system
+decision: Bind declared project artifacts automatically to the validator contract of the active domain and execute them as effective checks.
+alternatives:
+  - id: manual-artifact-checks
+    assessment: Rejected because duplicated commands can drift from the active domain contract.
+  - id: core-specific-artifact-types
+    assessment: Rejected because domain vocabulary and interpretation must remain outside the core.
+  - id: profile-derived-artifact-checks
+    assessment: Selected because the domain owns interpretation while the core owns deterministic binding and execution.
+criteria:
+  - domain-neutral core representation
+  - deterministic check identity and ordering
+  - validator and artifact path safety
+  - compatibility with projects that declare no artifact instances
+limits:
+  - One active artifact contract currently applies to every declared artifact instance.
+  - Successful validation establishes contract conformance, not philosophical truth or artistic quality.
+event: .recursive-codex/events/0044-bind-domain-artifacts-automatically.yaml

@@ -216,6 +216,56 @@ class ProjectValidatorTests(unittest.TestCase):
             errors,
         )
 
+    def test_domain_artifact_instance_is_validated(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with mock.patch.object(
+                sys, "argv", ["init_project.py", str(root), "--domain", "philosophy"]
+            ):
+                self.assertEqual(init_project.main(), 0)
+            (root / "argument.json").write_text("{}", encoding="utf-8")
+            contract = root / ".recursive-codex" / "project.yaml"
+            contract.write_text(
+                contract.read_text(encoding="utf-8").replace(
+                    "artifacts: []", "artifacts:\n  - id: thesis\n    path: argument.json"
+                ), encoding="utf-8",
+            )
+            errors = validate_project.validate(root)
+        self.assertEqual(errors, [])
+
+    def test_artifact_requires_contract_and_safe_existing_path(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with mock.patch.object(sys, "argv", ["init_project.py", str(root)]):
+                self.assertEqual(init_project.main(), 0)
+            contract = root / ".recursive-codex" / "project.yaml"
+            contract.write_text(
+                contract.read_text(encoding="utf-8").replace(
+                    "artifacts: []", "artifacts:\n  - id: missing\n    path: ../outside.json"
+                ), encoding="utf-8",
+            )
+            errors = validate_project.validate(root)
+        self.assertIn("artifacts[0].path must stay inside the project", errors)
+        self.assertIn("artifacts require domain artifact_contract", errors)
+
+    def test_artifact_check_id_cannot_collide(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with mock.patch.object(
+                sys, "argv", ["init_project.py", str(root), "--domain", "logic"]
+            ):
+                self.assertEqual(init_project.main(), 0)
+            (root / "proof.json").write_text("{}", encoding="utf-8")
+            contract = root / ".recursive-codex" / "project.yaml"
+            text = contract.read_text(encoding="utf-8").replace(
+                "artifacts: []", "artifacts:\n  - id: proof\n    path: proof.json"
+            ).replace(
+                "checks: []", "checks:\n  - id: artifact-proof\n    command:\n      - check\n    ephemeral_outputs: []"
+            )
+            contract.write_text(text, encoding="utf-8")
+            errors = validate_project.validate(root)
+        self.assertIn("artifacts[0].id produces a duplicate effective check id", errors)
+
 
 
 class InitializerTests(unittest.TestCase):

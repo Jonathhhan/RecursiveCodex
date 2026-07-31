@@ -1,0 +1,77 @@
+schema_version: 1
+id: bind-domain-artifacts-automatically
+operation: local_update
+goal: Turn project artifact declarations into deterministic checks derived from the active domain contract.
+baseline: stabilized event .recursive-codex/events/0043-add-unified-project-audit.yaml
+scope:
+  allowed:
+    - scripts/validate_project.py
+    - scripts/run_autonomous.py
+    - schemas/project.schema.json
+    - templates/project.yaml
+    - docs/ARCHITECTURE.md
+    - docs/KNOWLEDGE_DOMAINS.md
+    - README.md
+    - tests/test_autonomous.py
+    - tests/test_validators.py
+    - .recursive-codex/decisions/0044-bind-domain-artifacts-automatically.yaml
+    - .recursive-codex/events/0044-bind-domain-artifacts-automatically.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - scripts/audit_project.py
+    - scripts/recursive_codex.py
+provenance:
+  sources:
+    - user request to continue implementing the language, logic, philosophy, and art architecture
+    - .recursive-codex/events/0043-add-unified-project-audit.yaml
+    - active domain artifact contracts
+  decisions:
+    - .recursive-codex/decisions/0044-bind-domain-artifacts-automatically.yaml
+changes:
+  - component: project contract
+    effect: adds optional artifact instances with stable IDs and safe project-relative paths
+  - component: project validator
+    effect: validates artifact contracts, instances, paths, existence, and derived check identities
+  - component: autonomous controller
+    effect: executes generated artifact checks after domain checks and before project checks
+  - component: documentation and templates
+    effect: documents declarative binding without importing domain vocabulary into the core
+relations:
+  - from: active domain artifact contract
+    to: declared project artifacts
+    effect: supplies the validator and artifact kind used for every generated check
+  - from: declared artifact ID
+    to: effective check ID
+    effect: deterministically derives the artifact-prefixed execution identity
+possibilities:
+  opened:
+    - auditable philosophy, language, logic, and art artifacts under one project protocol
+    - automatic artifact validation in isolated candidates
+    - future graph relations among artifact instances
+  restricted:
+    - validator drift caused by duplicated manual commands
+    - unsafe or missing artifact paths
+    - collisions between generated and explicitly declared checks
+  deferred:
+    - multiple artifact contracts per active domain
+    - artifact dependency graph validation
+    - controller package decomposition
+variants:
+  - id: profile-derived-artifact-checks
+    status: selected
+    reason: It preserves domain authority while making execution automatic and deterministic.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0044-bind-domain-artifacts-automatically.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 147 tests
+  - check: python scripts/recursive_codex.py audit . --json
+    result: passed with 44 events, 44 decisions, 32 structured baselines, and no hard errors
+  - check: project, minimal-project, and change-event validators plus git diff --check
+    result: passed
+recovery:
+  strategy: Remove artifact-instance schema, validation, execution, tests, and documentation, then remove this decision and event.
+status: proposed

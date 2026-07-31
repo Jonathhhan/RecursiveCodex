@@ -52,6 +52,30 @@ class AutonomousControllerTests(unittest.TestCase):
         self.assertEqual([item["id"] for item in checks],
                          ["domain-check", "project-check"])
 
+    def test_effective_checks_bind_artifacts_between_domain_and_project(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            profile = root / ".recursive-codex" / "domain.yaml"
+            profile.parent.mkdir()
+            profile.write_text(
+                "schema_version: 1\nid: philosophy\nauthority:\n  default: owner\n"
+                "artifact_contract:\n  validator: scripts/validate_domain_artifact.py\n"
+                "  kind: philosophy\nchecks:\n  - id: domain-check\n"
+                "    command:\n      - domain\n    ephemeral_outputs: []\n",
+                encoding="utf-8",
+            )
+            checks = run_autonomous.effective_declared_checks(root, {
+                "artifacts": [{"id": "thesis", "path": "argument.json"}],
+                "checks": [{"id": "project-check", "command": ["project"],
+                            "ephemeral_outputs": []}],
+            })
+        self.assertEqual(
+            [item["id"] for item in checks],
+            ["domain-check", "artifact-thesis", "project-check"],
+        )
+        self.assertEqual(checks[1]["command"][-2:], ["philosophy", "argument.json"])
+        self.assertTrue(Path(checks[1]["command"][1]).is_absolute())
+
     def test_resolution_uses_native_path_match(self):
         with mock.patch.object(
             run_autonomous.shutil, "which", return_value="C:/npm/codex.CMD"

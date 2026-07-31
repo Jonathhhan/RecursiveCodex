@@ -22,6 +22,18 @@
         "protected": {"type": "array", "items": {"type": "string"}}
       }
     },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "path"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+          "path": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
     "checks": {
       "type": "array",
       "items": {
