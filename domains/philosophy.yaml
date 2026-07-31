@@ -1,0 +1,50 @@
+schema_version: 1
+id: philosophy
+description: Profile for concept formation, source-bound interpretation, objections, and reasoned philosophical judgment.
+authority:
+  default: philosophical-authority
+vocabulary:
+  reserved:
+    - thesis
+    - concept
+    - argument
+    - objection
+    - interpretation
+source_policy:
+  require_primary_sources: true
+  distinguish:
+    - source_claim
+    - interpretation
+    - inference
+    - objection
+    - authorized_judgment
+validity_dimensions:
+  - conceptual-clarity
+  - inferential-coherence
+  - source-fidelity
+  - objection-response
+  - scope-discipline
+operation_cycle:
+  - distinguish
+  - formulate
+  - interpret
+  - object
+  - respond
+  - reformulate
+  - stabilize
+artifact_contract:
+  validator: scripts/validate_domain_artifact.py
+  kind: philosophy
+collective_roles:
+  - id: conceptual-reviewer
+    mandate: Identify equivocation, category errors, hidden distinctions, and changes of conceptual scope.
+  - id: source-interpretation-reviewer
+    mandate: Separate textual evidence from reconstruction and rival interpretation.
+  - id: objection-reviewer
+    mandate: Formulate the strongest relevant objection and evaluate whether the response changes the thesis.
+checks: []
+limits:
+  - Validator success does not establish philosophical truth.
+  - Citation does not establish interpretive fidelity.
+  - Reviewer agreement does not replace philosophical authority.
+  - Technical autonomy may organize reasons but cannot silently settle normative or metaphysical validity.

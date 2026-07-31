@@ -1,0 +1,15 @@
+{
+  "kind": "logic",
+  "premises": [
+    "If every stabilized operation records its authority, then operation O records its authority.",
+    "Every stabilized operation records its authority.",
+    "O is a stabilized operation."
+  ],
+  "conclusion": "Operation O records its authority.",
+  "logic": "classical first-order logic",
+  "derivation": [
+    "Universal instantiation on the authority premise for O.",
+    "Modus ponens using that O is stabilized."
+  ],
+  "countermodel_status": "not-found"
+}

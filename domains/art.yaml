@@ -1,0 +1,47 @@
+schema_version: 1
+id: art
+description: Profile for generative artistic practice, material transformation, comparative critique, and curatorial stabilization.
+authority:
+  default: artistic-authority
+vocabulary:
+  reserved:
+    - work
+    - medium
+    - material
+    - gesture
+    - composition
+    - curatorial-selection
+source_policy:
+  require_primary_sources: false
+validity_dimensions:
+  - material-coherence
+  - formal-relation
+  - experiential-effect
+  - contextual-responsibility
+  - declared-intention
+operation_cycle:
+  - propose
+  - generate
+  - transform
+  - juxtapose
+  - experience
+  - critique
+  - select
+  - stabilize
+artifact_contract:
+  validator: scripts/validate_domain_artifact.py
+  kind: art
+collective_roles:
+  - id: formal-reviewer
+    mandate: Compare composition, rhythm, contrast, repetition, and material relations across variants.
+  - id: experiential-reviewer
+    mandate: Describe situated perceptual and affective effects without converting response into universal judgment.
+  - id: context-reviewer
+    mandate: Examine references, exclusions, appropriation, presentation context, and consequences for affected participants.
+collective_roles_decide_by_vote: false
+checks: []
+limits:
+  - Validator success does not establish artistic value.
+  - Novelty metrics do not replace artistic or curatorial authority.
+  - Audience response is situated evidence rather than universal judgment.
+  - Generative provenance and materially significant transformations must remain inspectable.

@@ -1,0 +1,42 @@
+schema_version: 1
+id: language
+description: Profile for recursive writing, semantic revision, style transformation, and multilingual composition.
+authority:
+  default: editorial-authority
+vocabulary:
+  reserved:
+    - utterance
+    - register
+    - semantic-commitment
+    - ambiguity
+    - revision
+source_policy:
+  require_primary_sources: false
+validity_dimensions:
+  - semantic-coherence
+  - pragmatic-fit
+  - stylistic-consistency
+  - preserved-commitments
+operation_cycle:
+  - draft
+  - vary
+  - compare
+  - critique
+  - revise
+  - stabilize
+artifact_contract:
+  validator: scripts/validate_domain_artifact.py
+  kind: language
+collective_roles:
+  - id: semantic-reviewer
+    mandate: Track meanings, references, ambiguities, and commitments across variants.
+  - id: style-reviewer
+    mandate: Compare rhythm, register, voice, and formal constraints without deciding factual truth.
+  - id: reader-reviewer
+    mandate: Test likely interpretations, exclusions, and pragmatic effects for the declared audience.
+checks: []
+limits:
+  - Fluency does not establish factual correctness.
+  - A style score cannot replace editorial authority.
+  - Translation must record materially changed semantic commitments.
+  - Stabilization preserves rejected variants and the reasons for selection.

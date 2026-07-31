@@ -1,0 +1,24 @@
+{
+  "kind": "philosophy",
+  "thesis": "Technical autonomy consists in rule-bound self-selection of admissible continuations, not independence from an environment.",
+  "concepts": [
+    "technical autonomy",
+    "admissible continuation",
+    "environmental perturbation"
+  ],
+  "reasons": [
+    "Every operation depends on prior state and declared constraints.",
+    "Environmental input does not directly determine stabilization."
+  ],
+  "objections": [
+    "Calling constrained execution autonomous may stretch the ordinary meaning of autonomy."
+  ],
+  "responses": [
+    "The thesis explicitly qualifies autonomy as technical and operational rather than absolute or metaphysical."
+  ],
+  "sources": [
+    "Niklas Luhmann on operational closure",
+    "Recursive Codex architecture and stabilized events"
+  ],
+  "authority_status": "proposed"
+}

@@ -1,0 +1,15 @@
+{
+  "kind": "language",
+  "text": "Ein System setzt sich fort, indem es auswählt, woran es anschließen kann.",
+  "audience": "philosophically interested readers",
+  "register": "conceptual essay",
+  "semantic_commitments": [
+    "continuation depends on selection",
+    "possibilities are organized rather than merely accumulated"
+  ],
+  "variants_considered": [
+    "Ein System besteht durch Anschluss.",
+    "Ein System setzt sich fort, indem es auswählt, woran es anschließen kann."
+  ],
+  "selection_reason": "The selected variant makes selection and continuation explicit without claiming biological identity."
+}

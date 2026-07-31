@@ -1,6 +1,8 @@
 # Recursive Codex
 
-Recursive Codex is a domain-configurable Codex plugin for complex work that must remain reviewable, reversible, and explicit about authority.
+Recursive Codex is a domain-configurable infrastructure for recursive, reviewable, reversible, and autonomously stabilized knowledge production.
+
+Software development is one application, not the universal model. Art, language, logic, philosophy, research, and other practices can define their own objects, validity dimensions, checks, and authorities without importing their vocabulary into the neutral core.
 
 It separates a small technical core from project-specific concepts. A philosophy manuscript, software architecture, research program, or artistic process can supply its own domain profile without turning one domain's vocabulary into a universal theory.
 
@@ -18,6 +20,9 @@ The cycle is recursive: review can reopen the problem, demand another variant, o
 - domain profiles with explicit authority, protected paths, vocabulary, and checks;
 - structured change events with provenance, alternatives, consequences, and decision status;
 - optional collectives of independent roles without majority truth;
+- first-class profiles for art, language, logic, philosophy, research, communicative action, and autopoiesis;
+- auditable JSON sidecars for linguistic variants, logical derivations, and philosophical arguments;
+- a shared artifact validator that checks declared structure without claiming domain truth;
 - deterministic initialization and validation scripts;
 - isolated autonomous proposal checks with structured commands, side-effect detection, verified rollback, and workspace locking;
 - a neutral example domain and unit tests.
@@ -43,6 +48,8 @@ domains/                        Reusable domain profiles
 scripts/                        Initialization and validation
 tests/                          Dependency-free test suite
 ```
+Art, language, logic, and philosophy workflows are described in `docs/KNOWLEDGE_DOMAINS.md`.
+
 
 The autonomous controller's security and trust boundary is documented in `docs/AUTONOMOUS_SECURITY.md`.
 

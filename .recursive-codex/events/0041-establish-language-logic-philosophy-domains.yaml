@@ -1,0 +1,84 @@
+schema_version: 1
+id: establish-language-logic-philosophy-domains
+operation: reorganization
+goal: Make art, language, logic, and philosophy operational first-class domains without treating software development as the universal model.
+baseline: stabilized event .recursive-codex/events/0040-execute-effective-domain-checks.yaml
+scope:
+  allowed:
+    - README.md
+    - docs/KNOWLEDGE_DOMAINS.md
+    - domains/language.yaml
+    - domains/art.yaml
+    - domains/logic.yaml
+    - domains/philosophy.yaml
+    - scripts/validate_domain_artifact.py
+    - examples/language-artifact.json
+    - examples/logic-artifact.json
+    - examples/philosophy-artifact.json
+    - examples/art-artifact.json
+    - tests/test_domain_artifacts.py
+    - tests/test_knowledge_domains.py
+    - .recursive-codex/decisions/0041-establish-language-logic-philosophy-domains.yaml
+    - .recursive-codex/events/0041-establish-language-logic-philosophy-domains.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - scripts/run_autonomous.py
+    - scripts/validate_project.py
+provenance:
+  sources:
+    - user clarification that Recursive Codex must serve language, logic, and philosophy as well as software
+    - docs/ARCHITECTURE.md
+    - domains/neutral.yaml
+    - domains/research.yaml
+  decisions:
+    - .recursive-codex/decisions/0041-establish-language-logic-philosophy-domains.yaml
+changes:
+  - component: domain catalog
+    effect: adds machine-readable art, language, logic, and philosophy profiles with separate cycles and validity dimensions
+  - component: artifact validation
+    effect: validates auditable sidecars for variants, derivations, objections, responses, sources, and selection reasons
+  - component: examples
+    effect: demonstrates valid non-software artifacts for all three domains
+  - component: project identity
+    effect: states that software is one application of a domain-neutral knowledge-production protocol
+relations:
+  - from: neutral core
+    to: knowledge domains
+    effect: supplies operation history, authority, validation, and stabilization without deciding domain truth
+  - from: artifact sidecar
+    to: effective project checks
+    effect: permits non-software structural criteria to run in the isolated autonomous validation boundary
+possibilities:
+  opened:
+    - autonomous recursive writing with preserved semantic commitments
+    - autonomous generative art with inspectable material provenance and curatorial selection
+    - explicit derivation and countermodel workflows
+    - source-bound philosophical objection and response cycles
+    - specialized domain tools attached through project checks
+  restricted:
+    - treating test success as philosophical truth
+    - treating fluent language as factual validation
+    - treating software-development vocabulary as universal core semantics
+  deferred:
+    - theorem-prover adapters
+    - corpus and translation analyzers
+    - source-locator and citation-support validation
+variants:
+  - id: profiles-plus-artifact-contracts
+    status: selected
+    reason: It combines operational usefulness with explicit epistemic restraint and core neutrality.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0041-establish-language-logic-philosophy-domains.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: four shipped example artifacts
+    result: passed
+  - check: project, minimal-project, and change-event validators plus git diff --check
+    result: passed 134 tests
+recovery:
+  strategy: Remove the four profiles, validator, examples, tests, and knowledge-domain documentation; restore README wording; then remove this decision and event.
+status: stabilized

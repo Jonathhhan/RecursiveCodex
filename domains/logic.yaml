@@ -1,0 +1,42 @@
+schema_version: 1
+id: logic
+description: Profile for explicit premises, rule-bound derivations, countermodels, and consistency analysis.
+authority:
+  default: logical-authority
+vocabulary:
+  reserved:
+    - premise
+    - conclusion
+    - inference-rule
+    - derivation
+    - countermodel
+source_policy:
+  require_primary_sources: false
+validity_dimensions:
+  - well-formedness
+  - rule-application
+  - consistency
+  - validity
+operation_cycle:
+  - formalize
+  - derive
+  - seek-countermodel
+  - revise
+  - verify
+  - stabilize
+artifact_contract:
+  validator: scripts/validate_domain_artifact.py
+  kind: logic
+collective_roles:
+  - id: derivation-reviewer
+    mandate: Verify that every conclusion step names premises and an admitted inference rule.
+  - id: countermodel-reviewer
+    mandate: Search independently for interpretations under which premises hold and the conclusion fails.
+  - id: formalization-reviewer
+    mandate: Check whether the formal representation preserves the declared informal commitments.
+checks: []
+limits:
+  - Syntactic validity does not establish the truth of premises.
+  - Failure to find a countermodel is not by itself a proof.
+  - The selected logic and admitted rules must remain explicit.
+  - Formalization changes require authority when they alter the problem rather than its notation.

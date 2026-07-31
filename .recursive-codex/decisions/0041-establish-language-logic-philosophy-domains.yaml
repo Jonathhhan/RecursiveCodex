@@ -1,0 +1,21 @@
+id: decision-establish-language-logic-philosophy-domains
+date: 2026-08-01
+status: accepted
+authority: recursive-codex-system
+decision: Establish art, language, logic, and philosophy as first-class Recursive Codex domains with distinct validity dimensions, cycles, authorities, and auditable artifact contracts.
+alternatives:
+  - id: software-centered-core
+    assessment: Rejected because software checks are one domain practice and must not define all recursive knowledge production.
+  - id: prose-only-documentation
+    assessment: Rejected because domain claims without machine-readable profiles and testable artifacts remain aspirational.
+  - id: profiles-plus-artifact-contracts
+    assessment: Selected because it preserves a neutral core while making four non-software workflows operational.
+criteria:
+  - domain neutrality
+  - distinct validity criteria
+  - executable structural validation
+  - explicit authority and epistemic limits
+limits:
+  - Structural artifact validation does not determine linguistic quality, premise truth, or philosophical truth.
+  - Specialized theorem provers, linguistic analyzers, and source tools remain project-level extensions.
+event: .recursive-codex/events/0041-establish-language-logic-philosophy-domains.yaml
