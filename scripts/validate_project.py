@@ -13,6 +13,18 @@ def _is_non_empty_string(value) -> bool:
     return isinstance(value, str) and bool(value.strip())
 
 
+def _safe_project_path(root: Path, value: str) -> Path | None:
+    configured = Path(value)
+    if configured.is_absolute() or ".." in configured.parts:
+        return None
+    resolved = (root / configured).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError:
+        return None
+    return resolved
+
+
 def validate(root: Path) -> list[str]:
     root = root.resolve()
     contract_path = root / ".recursive-codex" / "project.yaml"
@@ -56,13 +68,19 @@ def validate(root: Path) -> list[str]:
         if not _is_non_empty_string(value):
             errors.append(f"paths.{key} must be a non-empty string")
             continue
-        configured = Path(value)
-        if configured.is_absolute() or ".." in configured.parts:
+        configured = _safe_project_path(root, value)
+        if configured is None:
             errors.append(f"paths.{key} must stay inside the project")
+        elif not configured.is_dir():
+            errors.append(f"paths.{key} directory does not exist: {value}")
 
     protected = paths.get("protected")
-    if not isinstance(protected, list) or not all(isinstance(item, str) for item in protected):
-        errors.append("paths.protected must be a list of strings")
+    if not isinstance(protected, list) or not all(_is_non_empty_string(item) for item in protected):
+        errors.append("paths.protected must be a list of non-empty strings")
+    else:
+        for index, value in enumerate(protected):
+            if _safe_project_path(root, value) is None:
+                errors.append(f"paths.protected[{index}] must stay inside the project")
 
     checks = data.get("checks")
     if not isinstance(checks, list) or not all(_is_non_empty_string(item) for item in checks):
