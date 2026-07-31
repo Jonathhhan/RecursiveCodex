@@ -1,0 +1,78 @@
+schema_version: 1
+id: validate-artifact-graph
+operation: local_update
+goal: Validate relations among declared artifacts and derive a deterministic dependency-first check order.
+baseline: stabilized event .recursive-codex/events/0044-bind-domain-artifacts-automatically.yaml
+scope:
+  allowed:
+    - scripts/artifact_graph.py
+    - scripts/validate_project.py
+    - scripts/run_autonomous.py
+    - schemas/project.schema.json
+    - docs/ARCHITECTURE.md
+    - docs/KNOWLEDGE_DOMAINS.md
+    - README.md
+    - tests/test_artifact_graph.py
+    - tests/test_autonomous.py
+    - tests/test_validators.py
+    - .recursive-codex/decisions/0045-validate-artifact-graph.yaml
+    - .recursive-codex/events/0045-validate-artifact-graph.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - scripts/audit_project.py
+    - scripts/validate_domain_artifact.py
+provenance:
+  sources:
+    - user request to continue
+    - .recursive-codex/events/0044-bind-domain-artifacts-automatically.yaml
+    - deferred artifact dependency graph validation
+  decisions:
+    - .recursive-codex/decisions/0045-validate-artifact-graph.yaml
+changes:
+  - component: artifact graph
+    effect: adds reusable missing-reference, duplicate-edge, and cycle validation
+  - component: project contract
+    effect: permits optional depends_on artifact IDs
+  - component: autonomous controller
+    effect: derives stable dependency-first artifact check order
+  - component: tests and documentation
+    effect: verifies graph failures and distinguishes precedence from domain meaning
+relations:
+  - from: artifact dependency declaration
+    to: project validation
+    effect: invalid graph structure blocks acceptance
+  - from: validated artifact graph
+    to: effective checks
+    effect: orders dependent validation after its prerequisites
+possibilities:
+  opened:
+    - inspectable chains of drafts, responses, arguments, and artistic transformations
+    - future domain-owned typed relations layered over neutral precedence
+    - graph visualization and impact analysis
+  restricted:
+    - missing artifact dependencies
+    - cyclic artifact production chains
+    - execution before declared prerequisites
+  deferred:
+    - typed domain relations
+    - artifact graph reporting in the unified audit
+    - controller package decomposition
+variants:
+  - id: neutral-dependency-edges
+    status: selected
+    reason: It adds relational structure while preserving the translation and authority boundary.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0045-validate-artifact-graph.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed
+  - check: python scripts/recursive_codex.py audit . --json
+    result: passed 151 tests
+  - check: project, minimal-project, and change-event validators plus git diff --check
+    result: passed with 45 events, 45 decisions, 33 structured baselines, and no hard errors
+recovery:
+  strategy: Remove depends_on support, graph ordering, related tests and documentation, then remove this decision and event.
+status: stabilized

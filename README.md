@@ -23,6 +23,7 @@ The cycle is recursive: review can reopen the problem, demand another variant, o
 - first-class profiles for art, language, logic, philosophy, research, communicative action, and autopoiesis;
 - auditable JSON sidecars for linguistic variants, logical derivations, and philosophical arguments;
 - automatically bound artifact instances whose domain validators run inside autonomous candidate isolation without claiming domain truth;
+- dependency-aware artifact graphs with stable execution order and cycle rejection;
 - deterministic initialization and validation scripts;
 - isolated autonomous proposal checks with structured commands, side-effect detection, verified rollback, and workspace locking;
 - a neutral example domain and unit tests.

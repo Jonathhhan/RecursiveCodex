@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from _mini_yaml import load
+from artifact_graph import dependency_errors
 
 DOMAIN_PATTERN = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 
@@ -104,7 +105,7 @@ def _validate_artifacts(
         if not isinstance(artifact, dict):
             errors.append(f"{prefix} must be a mapping")
             continue
-        unknown = set(artifact) - {"id", "path"}
+        unknown = set(artifact) - {"id", "path", "depends_on"}
         if unknown:
             errors.append(f"{prefix} has unsupported fields: {sorted(unknown)}")
         identifier = artifact.get("id")
@@ -122,6 +123,7 @@ def _validate_artifacts(
             errors.append(f"{prefix}.path must stay inside the project")
         elif not configured.is_file():
             errors.append(f"{prefix}.path does not exist: {path_value}")
+    errors.extend(dependency_errors(value))
     if contract is not None and not isinstance(contract, dict):
         errors.append("domain artifact_contract must be a mapping")
     elif isinstance(contract, dict):

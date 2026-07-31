@@ -266,6 +266,33 @@ class ProjectValidatorTests(unittest.TestCase):
             errors = validate_project.validate(root)
         self.assertIn("artifacts[0].id produces a duplicate effective check id", errors)
 
+    def test_artifact_dependency_cycle_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with mock.patch.object(
+                sys, "argv", ["init_project.py", str(root), "--domain", "language"]
+            ):
+                self.assertEqual(init_project.main(), 0)
+            (root / "draft.json").write_text("{}", encoding="utf-8")
+            (root / "revision.json").write_text("{}", encoding="utf-8")
+            contract = root / ".recursive-codex" / "project.yaml"
+            contract.write_text(
+                contract.read_text(encoding="utf-8").replace(
+                    "artifacts: []",
+                    "artifacts:\n"
+                    "  - id: draft\n"
+                    "    path: draft.json\n"
+                    "    depends_on:\n"
+                    "      - revision\n"
+                    "  - id: revision\n"
+                    "    path: revision.json\n"
+                    "    depends_on:\n"
+                    "      - draft",
+                ), encoding="utf-8",
+            )
+            errors = validate_project.validate(root)
+        self.assertIn("artifact dependency cycle: draft -> revision -> draft", errors)
+
 
 
 class InitializerTests(unittest.TestCase):

@@ -65,13 +65,16 @@ class AutonomousControllerTests(unittest.TestCase):
                 encoding="utf-8",
             )
             checks = run_autonomous.effective_declared_checks(root, {
-                "artifacts": [{"id": "thesis", "path": "argument.json"}],
+                "artifacts": [
+                    {"id": "response", "path": "response.json", "depends_on": ["thesis"]},
+                    {"id": "thesis", "path": "argument.json"},
+                ],
                 "checks": [{"id": "project-check", "command": ["project"],
                             "ephemeral_outputs": []}],
             })
         self.assertEqual(
             [item["id"] for item in checks],
-            ["domain-check", "artifact-thesis", "project-check"],
+            ["domain-check", "artifact-thesis", "artifact-response", "project-check"],
         )
         self.assertEqual(checks[1]["command"][-2:], ["philosophy", "argument.json"])
         self.assertTrue(Path(checks[1]["command"][1]).is_absolute())

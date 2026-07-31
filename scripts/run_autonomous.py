@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from _mini_yaml import load
+from artifact_graph import ordered_artifacts
 from generative_kernel import append_event, read_journal, replay, select_next
 from validate_change_event import validate as validate_event
 from validate_project import validate
@@ -854,7 +855,7 @@ def effective_declared_checks(root: Path, contract: dict) -> list[dict]:
         if not isinstance(validator, str) or not isinstance(kind, str):
             raise ValueError("domain artifact contract is invalid")
         validator_path = Path(__file__).resolve().parents[1] / validator
-        for artifact in artifacts:
+        for artifact in ordered_artifacts(artifacts):
             artifact_checks.append({
                 "id": f"artifact-{artifact['id']}",
                 "command": [sys.executable, str(validator_path), kind, artifact["path"]],

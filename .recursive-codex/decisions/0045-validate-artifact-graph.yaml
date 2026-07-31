@@ -1,0 +1,21 @@
+id: decision-validate-artifact-graph
+date: 2026-08-01
+status: accepted
+authority: recursive-codex-system
+decision: Represent artifact dependencies as a domain-neutral acyclic graph and execute artifact checks in stable dependency-first order.
+alternatives:
+  - id: declaration-order-only
+    assessment: Rejected because it cannot state or verify that one artifact operationally depends on another.
+  - id: domain-specific-relation-types-in-core
+    assessment: Rejected because entailment, response, derivation, and artistic transformation belong to domain interpretation.
+  - id: neutral-dependency-edges
+    assessment: Selected because it makes precedence inspectable without transferring semantic authority to the core.
+criteria:
+  - existing-target validation
+  - cycle rejection
+  - stable dependency-first order
+  - no domain vocabulary in the core graph
+limits:
+  - A dependency edge asserts operational precedence only.
+  - The graph does not establish logical consequence, semantic validity, philosophical truth, or artistic quality.
+event: .recursive-codex/events/0045-validate-artifact-graph.yaml

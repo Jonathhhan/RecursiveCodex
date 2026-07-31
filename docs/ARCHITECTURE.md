@@ -22,6 +22,7 @@ The autonomous controller executes one effective ordered check list. Domain-prof
 Check identifiers are unique across both scopes. A project check cannot shadow or replace a domain check. The domain supplies invariant criteria; the project may add repository-specific criteria.
 
 Validation of check declarations does not count as their execution. `validate_project.py` rejects malformed or ambiguous declarations, while the autonomous controller executes the effective list before promotion.
+Artifacts may declare `depends_on` edges to other artifact IDs. The project validator rejects missing targets, duplicate edges, and cycles; the controller derives a stable dependency-first execution order. These edges express production or validation precedence, not semantic entailment or aesthetic rank.
 A domain may publish an `artifact_contract` containing its installed validator and artifact kind. The project binds concrete `{id, path}` instances through `artifacts`. Their effective check IDs are `artifact-<id>` and cannot shadow domain or project checks.
 
 

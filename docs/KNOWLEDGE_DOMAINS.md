@@ -54,6 +54,9 @@ Projects bind artifact instances in `.recursive-codex/project.yaml`:
 artifacts:
   - id: principal-thesis
     path: artifacts/thesis.json
+  - id: response
+    path: artifacts/response.json
+    depends_on: [principal-thesis]
 ```
 
-The active domain supplies the validator and kind. The controller derives an `artifact-principal-thesis` check automatically and executes it between domain checks and project checks in the isolated candidate workspace. Missing files, unsafe paths, absent domain contracts, and effective check-ID collisions fail project validation.
+The active domain supplies the validator and kind. The controller derives artifact checks automatically and executes them in dependency-first order between domain checks and project checks in the isolated candidate workspace. Missing files, unsafe paths, absent domain contracts, unknown dependencies, cycles, and effective check-ID collisions fail project validation. A dependency records operational precedence; its domain-specific meaning remains with the active profile and authority.
