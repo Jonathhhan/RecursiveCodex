@@ -428,10 +428,19 @@ def copy_project(root: Path, destination: Path) -> None:
 
 
 def declared_check_error(
-    declared_check: dict, root: Path, timeout: float
+    declared_check: dict, root: Path, timeout: float,
+    placeholders: dict[str, str] | None = None,
 ) -> str | None:
     identifier = declared_check["id"]
-    command = declared_check["command"]
+    replacements = placeholders or {}
+    command: list[str] = []
+    for argument in declared_check["command"]:
+        if argument in replacements:
+            command.append(replacements[argument])
+        elif re.fullmatch(r"<[^<>]+>", argument):
+            return f"declared check has unresolved placeholder: {identifier}: {argument}"
+        else:
+            command.append(argument)
     try:
         completed = subprocess.run(
             command,
@@ -452,10 +461,13 @@ def declared_check_error(
     return f"declared check failed: {identifier}{suffix}"
 
 
-def isolated_check_error(declared_check: dict, root: Path, timeout: float) -> str | None:
+def isolated_check_error(
+    declared_check: dict, root: Path, timeout: float,
+    placeholders: dict[str, str] | None = None,
+) -> str | None:
     ephemeral_outputs = declared_check.get("ephemeral_outputs", [])
     before = snapshot_tree(root, ephemeral_outputs)
-    check_error = declared_check_error(declared_check, root, timeout)
+    check_error = declared_check_error(declared_check, root, timeout, placeholders)
     after = snapshot_tree(root, ephemeral_outputs)
     changes = snapshot_changes(before, after)
     if changes:
@@ -555,7 +567,8 @@ def _evaluate_proposal_in_place(
         return rollback(post_errors)
 
     for declared_check in checks:
-        check_error = declared_check_error(declared_check, root, timeout)
+        check_error = declared_check_error(
+            declared_check, root, timeout, {"<event-file>": event_paths[0]})
         if check_error is not None:
             return rollback([check_error])
 
@@ -645,7 +658,8 @@ def apply_proposal(
         stabilized_event = (candidate / event_paths[0]).read_bytes()
         stabilized_decision = (candidate / decision_paths[0]).read_bytes()
         for declared_check in checks:
-            check_error = isolated_check_error(declared_check, candidate, timeout)
+            check_error = isolated_check_error(
+                declared_check, candidate, timeout, {"<event-file>": event_paths[0]})
             if check_error is not None:
                 return [check_error]
             check_id = declared_check["id"]

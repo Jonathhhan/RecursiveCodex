@@ -184,6 +184,38 @@ class ProjectValidatorTests(unittest.TestCase):
             errors = validate_project.validate(root)
         self.assertIn("checks[0].id duplicates a domain profile check id", errors)
 
+    def test_domain_output_cannot_overlap_project_protected_path(self):
+        declaration = (
+            "checks:\n"
+            "  - id: domain-writer\n"
+            "    command:\n"
+            "      - python\n"
+            "      - check.py\n"
+            "    ephemeral_outputs:\n"
+            "      - protected/domain-output.txt"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with mock.patch.object(sys, "argv", ["init_project.py", str(root)]):
+                self.assertEqual(init_project.main(), 0)
+            contract = root / ".recursive-codex" / "project.yaml"
+            contract.write_text(
+                contract.read_text(encoding="utf-8").replace(
+                    "protected: []", "protected:\n    - protected/domain-output.txt"
+                ),
+                encoding="utf-8",
+            )
+            profile = root / ".recursive-codex" / "domain.yaml"
+            profile.write_text(
+                profile.read_text(encoding="utf-8").replace("checks: []", declaration),
+                encoding="utf-8",
+            )
+            errors = validate_project.validate(root)
+        self.assertIn(
+            "domain profile checks[0].ephemeral_outputs[0] overlaps protected state",
+            errors,
+        )
+
 
 
 class InitializerTests(unittest.TestCase):

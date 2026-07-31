@@ -41,10 +41,11 @@ Philosophical autonomy therefore means autonomous organization of distinctions a
 The common sidecar validator accepts JSON artifacts:
 
 ```powershell
+python scripts/validate_domain_artifact.py art path/to/art.json
 python scripts/validate_domain_artifact.py language path/to/language.json
 python scripts/validate_domain_artifact.py logic path/to/argument.json
 python scripts/validate_domain_artifact.py philosophy path/to/thesis.json
 ```
 
+
 Projects can bind the relevant invocation into `.recursive-codex/project.yaml`. It then joins the effective check list and runs inside the same isolated candidate workspace as domain and project checks.
-python scripts/validate_domain_artifact.py art path/to/art.json

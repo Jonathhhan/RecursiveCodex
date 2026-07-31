@@ -1,0 +1,21 @@
+id: decision-close-domain-review-findings
+date: 2026-08-01
+status: accepted
+authority: recursive-codex-system
+decision: Resolve event-file placeholders fail-closed, apply project protected paths to domain outputs, and strengthen non-software artifact list validation.
+alternatives:
+  - id: literal-placeholders
+    assessment: Rejected because executable domain checks cannot consume a proposal event that way.
+  - id: unrestricted-template-engine
+    assessment: Rejected because broad substitution would enlarge the command boundary unnecessarily.
+  - id: scoped-event-binding
+    assessment: Selected because it binds one declared token to the parent-known proposal path and rejects unknown tokens.
+criteria:
+  - communicative-action checks are executable
+  - unresolved placeholders fail closed
+  - domain outputs respect complete project protection
+  - artifact lists contain meaningful scalar entries
+limits:
+  - Artifact contracts remain opt-in project capabilities until the project schema declares artifact instances.
+  - Event and decision graph validation remains a separate architectural phase.
+event: .recursive-codex/events/0042-close-domain-review-findings.yaml

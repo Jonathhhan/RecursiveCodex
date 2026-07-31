@@ -328,6 +328,36 @@ class AutonomousControllerTests(unittest.TestCase):
         self.assertIn("[REDACTED PRIVATE KEY]", diagnostic)
         self.assertIn("environment=[REDACTED ENV]", diagnostic)
 
+
+    def test_declared_check_resolves_event_file_placeholder(self):
+        declared = {
+            "id": "discourse", "command": ["python", "validator.py", "<event-file>"],
+            "ephemeral_outputs": [],
+        }
+        completed = mock.Mock(returncode=0, stdout="", stderr="")
+        with mock.patch.object(run_autonomous.subprocess, "run", return_value=completed) as process:
+            error = run_autonomous.declared_check_error(
+                declared, Path("project"), 10,
+                {"<event-file>": ".recursive-codex/events/new.yaml"},
+            )
+        self.assertIsNone(error)
+        self.assertEqual(
+            process.call_args.args[0],
+            ["python", "validator.py", ".recursive-codex/events/new.yaml"],
+        )
+
+    def test_declared_check_rejects_unresolved_placeholder(self):
+        declared = {
+            "id": "unknown", "command": ["validator", "<unknown-file>"],
+            "ephemeral_outputs": [],
+        }
+        with mock.patch.object(run_autonomous.subprocess, "run") as process:
+            error = run_autonomous.declared_check_error(declared, Path("project"), 10)
+        self.assertEqual(
+            error, "declared check has unresolved placeholder: unknown: <unknown-file>"
+        )
+        process.assert_not_called()
+
     def test_validation_diagnostic_redacts_before_truncation(self):
         secret = "sensitive-value-that-must-not-survive"
         with mock.patch.dict(

@@ -128,7 +128,6 @@ def validate(root: Path) -> list[str]:
                 domain_authority.get("default")
             ):
                 errors.append("domain profile authority.default must be set")
-            errors.extend(_validate_checks(root, domain_profile.get("checks"), "domain profile checks"))
             if isinstance(domain_profile.get("checks"), list):
                 domain_checks = [item for item in domain_profile["checks"] if isinstance(item, dict)]
 
@@ -163,6 +162,11 @@ def validate(root: Path) -> list[str]:
                 errors.append(f"paths.protected[{index}] must stay inside the project")
 
     errors.extend(_validate_checks(root, data.get("checks"), "checks", protected if isinstance(protected, list) else []))
+    if isinstance(domain_profile, dict):
+        errors.extend(_validate_checks(
+            root, domain_profile.get("checks"), "domain profile checks",
+            protected if isinstance(protected, list) else [],
+        ))
 
     project_checks = data.get("checks")
     if isinstance(project_checks, list):

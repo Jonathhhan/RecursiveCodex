@@ -1,0 +1,74 @@
+schema_version: 1
+id: close-domain-review-findings
+operation: revision
+goal: Close executable domain-check and artifact-validation defects identified by repository review.
+baseline: stabilized event .recursive-codex/events/0041-establish-language-logic-philosophy-domains.yaml
+scope:
+  allowed:
+    - scripts/run_autonomous.py
+    - scripts/validate_project.py
+    - scripts/validate_domain_artifact.py
+    - docs/KNOWLEDGE_DOMAINS.md
+    - tests/test_autonomous.py
+    - tests/test_validators.py
+    - tests/test_domain_artifacts.py
+    - .recursive-codex/decisions/0042-close-domain-review-findings.yaml
+    - .recursive-codex/events/0042-close-domain-review-findings.yaml
+  protected:
+    - docs/GENEALOGY.md
+    - schemas/project.schema.json
+provenance:
+  sources:
+    - repository review of commit 14f5d16
+    - domains/communicative-action.yaml
+    - scripts/run_autonomous.py
+    - scripts/validate_project.py
+    - scripts/validate_domain_artifact.py
+  decisions:
+    - .recursive-codex/decisions/0042-close-domain-review-findings.yaml
+changes:
+  - component: check command binding
+    effect: replaces the exact event-file token with the parent-known proposal path and rejects unresolved tokens
+  - component: domain output validation
+    effect: validates domain ephemeral outputs against trust anchors and project-specific protected paths
+  - component: domain artifacts
+    effect: requires list entries to be non-empty strings and pairs philosophical objections and responses one-to-one
+  - component: knowledge-domain documentation
+    effect: restores all four validator examples to one rendered PowerShell block
+relations:
+  - from: proposed event
+    to: communicative-action check
+    effect: supplies the concrete discourse-bearing event without shell interpolation
+  - from: project protected paths
+    to: domain checks
+    effect: prevents effective domain checks from exempting protected writes from side-effect detection
+possibilities:
+  opened:
+    - executable communicative-action autonomous cycles
+    - safer domain-specific temporary outputs
+    - stronger audit sidecars for non-software work
+  restricted:
+    - unresolved check placeholders
+    - domain-output overlap with protected state
+    - empty or non-string semantic list entries
+  deferred:
+    - automatic artifact-instance binding
+    - event and decision graph validation
+    - controller and validator package decomposition
+variants:
+  - id: scoped-event-binding
+    status: selected
+    reason: It repairs the known domain check without introducing a general template language.
+collective_findings: []
+authority:
+  required: true
+  status: accepted
+  reference: .recursive-codex/decisions/0042-close-domain-review-findings.yaml
+validation:
+  - check: python -m unittest discover -s tests -v
+    result: passed 139 tests
+  - check: project, minimal-project, and change-event validators plus git diff --check
+    result: passed
+recovery:
+  strategy: Restore literal check arguments and trust-anchor-only domain output validation, restore shallow artifact lists and documentation, then remove this decision and event.
+status: stabilized

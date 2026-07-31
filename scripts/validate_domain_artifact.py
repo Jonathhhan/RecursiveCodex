@@ -52,6 +52,8 @@ def _non_empty(value: object, expected: type) -> bool:
         return False
     if isinstance(value, str):
         return bool(value.strip())
+    if isinstance(value, list):
+        return bool(value) and all(isinstance(item, str) and bool(item.strip()) for item in value)
     return bool(value)
 
 
@@ -72,7 +74,7 @@ def validate(data: object, expected_kind: str) -> list[str]:
         errors.append("countermodel_status is invalid")
     if expected_kind == "philosophy" and isinstance(data.get("objections"), list):
         responses = data.get("responses")
-        if isinstance(responses, list) and len(responses) < len(data["objections"]):
+        if isinstance(responses, list) and len(responses) != len(data["objections"]):
             errors.append("every philosophical objection requires a response")
     return errors
 

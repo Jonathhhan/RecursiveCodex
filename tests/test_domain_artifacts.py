@@ -41,6 +41,24 @@ class DomainArtifactTests(unittest.TestCase):
 
             validator.validate(artifact, "philosophy"),
         )
+    def test_artifact_lists_require_non_empty_strings(self):
+        artifact = {
+            "kind": "logic", "premises": ["P", ""], "conclusion": "P",
+            "logic": "classical logic", "derivation": ["premise P"],
+            "countermodel_status": "not-found",
+        }
+        self.assertIn(
+            "premises must be a non-empty list",
+            validator.validate(artifact, "logic"),
+        )
+
+    def test_philosophical_responses_match_objections_one_to_one(self):
+        artifact = {
+            "kind": "philosophy", "thesis": "T", "concepts": ["C"],
+            "reasons": ["R"], "objections": ["O"], "responses": ["A", "extra"],
+            "sources": ["S"], "authority_status": "proposed",
+        }
+        self.assertIn("every philosophical objection requires a response", validator.validate(artifact, "philosophy"))
 
     def test_shipped_examples_are_valid(self):
         for kind in ("art", "language", "logic", "philosophy"):
