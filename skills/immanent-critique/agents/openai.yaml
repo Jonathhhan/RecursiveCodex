@@ -1,0 +1,4 @@
+interface:
+  display_name: "Immanent Critique"
+  short_description: "Test a work against its own claims and tensions"
+  default_prompt: "Use $immanent-critique to examine this text through its own concepts and commitments."
