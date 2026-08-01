@@ -2,11 +2,20 @@
 
 <!-- State only the reasoning that is not evident from the diff, tests, or issue. -->
 
-## Choice
+## Material and intervention
 
-- Selected:
+- Baseline and provenance:
+- Preserved:
+- Selected or changed:
+- Cut or deferred:
 - Material alternative, if any:
-- Reason:
+
+## Candidate and countercheck
+
+- Actual result:
+- Unexpected effect:
+- Alternative description or countercheck:
+- Authority/status: <!-- proposed, accepted, rejected, or deferred -->
 
 ## Relational consequences
 

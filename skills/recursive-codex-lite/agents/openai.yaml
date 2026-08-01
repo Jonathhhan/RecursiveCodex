@@ -1,4 +1,4 @@
 interface:
   display_name: "Recursive Codex Lite"
-  short_description: "Document consequential changes without duplicating Git or CI"
-  default_prompt: "Use $recursive-codex-lite to assess whether this change needs a concise relational change note."
+  short_description: "Execute and assess consequential changes reversibly"
+  default_prompt: "Use $recursive-codex-lite to execute this change as a reversible cycle and document only consequential reasoning."

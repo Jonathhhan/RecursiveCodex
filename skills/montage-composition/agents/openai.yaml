@@ -1,4 +1,0 @@
-interface:
-  display_name: "Montage Composition"
-  short_description: "Compose through consequential juxtaposition"
-  default_prompt: "Use $montage-composition to arrange this material into a montage without erasing provenance."
