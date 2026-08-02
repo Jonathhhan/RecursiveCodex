@@ -1,4 +1,4 @@
 interface:
-  display_name: "Recursive Codex Lite"
-  short_description: "Execute and assess consequential changes reversibly"
-  default_prompt: "Use $recursive-codex-lite to execute this change as a reversible cycle and document only consequential reasoning."
+  display_name: "Recursive Codex: Reason-Loss Test"
+  short_description: "Preserve selection reasons normal records lose"
+  default_prompt: "Use $recursive-codex-lite to record only why this option was selected when normal project history cannot preserve that reason."
