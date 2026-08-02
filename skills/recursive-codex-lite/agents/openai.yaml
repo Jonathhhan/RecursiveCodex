@@ -1,0 +1,4 @@
+interface:
+  display_name: "Recursive Codex: Reason-Loss Test"
+  short_description: "Preserve selection reasons normal records lose"
+  default_prompt: "Use $recursive-codex-lite to record only why this option was selected when normal project history cannot preserve that reason."
